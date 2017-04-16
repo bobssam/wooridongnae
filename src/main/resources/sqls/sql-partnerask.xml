@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="partnerask">
+    <resultMap type="com.suba.vo.PartnerAskVO" id="partnerAskVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM partner_ask
+    	WHERE
+		<if test="where.partnerAskNo != null and where.partnerAskNo != ''" >
+			AND partner_ask_no = #{where.partnerAskNo}
+		</if>
+
+	</select>
+    <select id="view" resultMap="partnerAskVO">
+		SELECT
+			partner_ask_no,
+			mobile,
+
+		FROM
+			partner_ask
+    	WHERE
+			partner_ask_no = #{partnerAskNo}
+		LIMIT 1
+   	</select>
+   	<insert id="add">
+   		INSERT INTO partner_ask (
+   			name,
+			mobile,
+			email,
+			comment,
+			reg_date
+		) VALUES (
+			#{name},
+			#{mobile},
+			#{email},
+			#{comment},
+			NOW()
+		)
+   	</insert>
+</mapper>

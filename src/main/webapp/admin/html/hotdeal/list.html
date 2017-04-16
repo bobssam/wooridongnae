@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var $tbody = $body.find('.data_grid tbody');
+	var data = obj.data;
+
+	if( data.isPopup ) {
+		$body.find('form,.header').hide();
+	}
+
+	$body.makeCheckAll();
+
+	var board = $tbody.board({
+		page: 1,
+		len: 10,
+		api: '/api/hotdeal/',
+		template: $body.find('.tmpl_notice'),
+		paging: $body.find('.pageing'),
+		onRender : function( $tar, datas ) {
+			$tar.find('button.edit').on('click', function(){
+
+				datas.type = 'modify';
+				datas.parent = board;
+				datas.callback = function() {
+					toastr.success('수정 성공');
+					board.reload();
+					$dialog.dialog('close');
+				}
+
+				var $dialog = $.loadDialog({
+					title: '핫딜정보',
+					popup: 'hotdeal/info',
+					data:datas,
+					width:'auto',
+				});
+
+				return false;
+			});
+
+
+			var filter = {hotdealNo:datas.hotdealNo};
+			$tar.find('button.alist').on('click', function(){
+
+				var $dialog = $.loadDialog({
+					title: '견적 리스트',
+					popup: '../hotdeal/ask',
+					data:{filter:filter},
+					width:'auto',
+				});
+
+				return false;
+			});
+		}
+	});
+
+
+	$body.find('button.del').on('click', function(){
+
+		var $list = $body.find('input[type=checkbox]:checked');
+		if( $list.length > 0 && confirm('선택된 글을 삭제하시겠습니까?') ) {
+
+			var docount = $list.length;
+			$list.each(function(i){
+
+				var $this = $(this).closest('tr');
+				var data = $this.data('data');
+
+				board.remove(data, function(res, datas){
+					if( res ) {
+						toastr.success( '삭제됨' );
+						board.reload();
+					}
+					if( --docount == 0 )
+						board.reload();
+				});
+
+			});
+		}
+	});
+
+	// 신규
+	$body.find('button.add').on('click', function(){
+		var data = {type:'new', parent:board};
+		var $dialog = null;
+		data.callback = function(res, datas) {
+			if( res ) {
+				$dialog.dialog('close');
+				board.reload();
+				toastr.success( '핫딜 추가 성공' );
+			}
+		};
+
+		$dialog = $.loadDialog({
+			title: '신규등록',
+			popup:'hotdeal/info',
+			width:'auto',
+			data:data
+		});
+	});
+
+
+	if( data.filter ) board.setFilter(data.filter);
+
+	$body.find('form').on('submit', function(){
+		board.setFilter($(this).formData());
+		board.load();
+		return false;
+	});
+	$body.find('form').trigger('submit');
+
+
+});
+
+</script>
+</head>
+<body>
+
+
+	<form class="search">
+		<table>
+			<tr>
+				<th>유저</th>
+				<td colspan="3"><input type="text" name="memberNo"></td>
+				<td rowspan="2" class="btns">
+					<button type="button" class="img clear">초기화</button><br/>
+					<button type="submit" class="img search">검색하기</button>
+				</td>
+			</tr>
+			<tr>
+				<th>시작일</th>
+				<td><input type="text" name="startRegDate" class="datepicker"></td>
+				<th>종료일</th>
+				<td><input type="text" name="endRegDate"  class="datepicker"></td>
+			</tr>
+		</table>
+
+	</form>
+
+	<div class="data_grid">
+
+		<div class="header">
+			<button type="button" class="btn add">등록하기</button>
+			<button type="button" class="btn red del">삭제하기</button>
+			<button type="button" class="btn green"><i class="fa fa-file-excel-o"></i> 엑셀 다운로드</button>
+		</div>
+
+		<div class="pageing"></div>
+		<table class="list">
+			<thead>
+				<tr>
+					<th width="30"><input name="check" type="checkbox"></th>
+					<th width="30">핫딜번호</th>
+					<th>제목</th>
+					<th width="130">등록일</th>
+					<th width="50">사용여부</th>
+					<th width="50">문의수</th>
+					<th width="170"></th>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div class="pageing"></div>
+	</div>
+
+<script type="text/html" class="tmpl_notice">
+<tr>
+	<td><input name="check" type="checkbox"></td>
+	<td>${hotdealNo}</td>
+	<td class="text">${title}</td>
+	<td>${timeConv(regDate)}</td>
+	<td>${isUse}</td>
+	<td>${askCount}</td>
+	<td><button type="button" class="btn ssmall alist">견적문의리스트</button>
+		<button type="button" class="btn ssmall edit">수정</button></td>
+</tr>
+</script>
+
+</body>
+</html>

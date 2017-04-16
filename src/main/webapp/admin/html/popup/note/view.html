@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+	
+	var $body = obj.$body;
+	$body.formData(obj.data);
+	console.log( obj.data )
+	
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+	
+	// 쪽히 확인 진행
+	if( obj.data.read == 0 )
+	$.ajax({
+		url : '/api/note/read',
+		data: {where: JSON.stringify( {noteNo:obj.data.noteNo} )},
+		dataType:'json',
+		type:'POST',
+		success:function( datas ) {
+			if( datas.status == 'ok' ) {
+				toastr.success('쪽지를 확인했습니다.');
+				obj.data.parent.reload();
+			}
+		}
+	});
+
+	
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<table>
+	<caption>데이터 수정</caption>
+	<tr class="onlyModify">
+		<th>번호</th>
+		<td><input name="memberNo" type="text" readonly="readonly"></td>
+		<th>지급 포인트</th>
+		<td><input name="point" type="text" value="0" readonly="readonly"></td>
+	</tr>
+	<tr>
+		<th>메모</th>
+		<td colspan="3">
+	
+			<textarea name="content" rows="6" cols="50" readonly="readonly"></textarea>
+		
+		</td>
+	</tr>
+
+	</table>
+	<div class="btns">
+	
+		<button type="button" class="btn cancel">확인</button>
+	
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+[
+	{
+		"name": "상품관리",
+		"child": [
+			{
+				"name":"상품관리",
+				"key":"goods"
+			}
+		] 
+	},
+	{
+		"name": "발급관리",
+		"child": [
+			{
+				"name":"발급현황",
+				"key":"now"
+			},
+			{
+				"name":"발급내역",
+				"key":"logs"
+			},
+			{
+				"name":"선발급중지내역",
+				"key":"stopped_product"
+			},
+			{
+				"name":"인증내역",
+				"key":"auth_log"
+			}
+		] 
+	},
+	{
+		"name": "통계관리",
+		"child": [
+			{
+				"name":"기간별 발급량 통계",
+				"key":"perdate"
+			},
+			{
+				"name":"연동사및 브랜드별 발급량 통계",
+				"key":"perdate2"
+			}
+		] 
+	},
+	{
+		"name": "시스템관리",
+		"child": [
+			{
+				"name":"메뉴관리",
+				"key":"menu"
+			},
+			{
+				"name":"계정관리",
+				"key":"user"
+			},
+			{
+				"name":"권한관리",
+				"key":"permission"
+			}
+		] 
+	}
+
+]

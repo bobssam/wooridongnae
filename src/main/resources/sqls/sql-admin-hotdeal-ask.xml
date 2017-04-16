@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin_hotdeal_ask">
+    <resultMap type="com.suba.vo.HotdealAskVO" id="hotdealAskVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM hotdeal_ask
+    	WHERE
+    		1=1
+		<if test='where.mobile != null and where.mobile != ""' >
+			AND title mobile '%${where.mobile}%'
+		</if>
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND member_no = #{where.memberNo}
+		</if>
+		<if test="where.hotdealNo != null and where.hotdealNo != ''" >
+			AND hotdeal_no = #{where.hotdealNo}
+		</if>
+	</select>
+    <select id="list" resultMap="hotdealAskVO">
+		SELECT
+			ha.hotdeal_ask_no,
+			ha.mobile,
+			ha.area,
+			ha.want_date,
+			ha.buy_type,
+			ha.pre_price,
+
+			ha.contract_duration,
+			ha.reg_date,
+			ha.member_no,
+			ha.hotdeal_no,
+			ha.is_answer,
+			h.title,
+
+			m.id
+		FROM
+			hotdeal_ask ha
+			LEFT JOIN member m
+			ON ha.member_no = m.member_no
+			JOIN hotdeal h
+			ON ha.hotdeal_no = h.hotdeal_no
+    	WHERE
+    		1=1
+		<if test='where.title != null and where.title != ""' >
+			AND ha.title like '%${where.title}%'
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND ha.member_no = #{where.memberNo}
+		</if>
+		<if test="where.hotdealNo != null and where.hotdealNo != ''" >
+			AND ha.hotdeal_no = #{where.hotdealNo}
+		</if>
+		ORDER BY hotdeal_ask_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="hotdealAskVO">
+		SELECT
+			h.hotdeal_ask_no,
+			h.mobile,
+			h.area,
+			h.want_date,
+			h.buy_type,
+			h.pre_price,
+
+			h.contract_duration,
+			h.reg_date,
+			h.member_no,
+			h.hotdeal_no,
+			h.ask,
+			h.is_answer,
+			h.memo,
+
+			m.id
+		FROM
+			hotdeal_ask h
+			LEFT JOIN member m
+			ON h.member_no = m.member_no
+    	WHERE
+    		1=1
+		<if test='where.hotdealAskNo != null and where.hotdealAskNo != ""' >
+			AND hotdeal_ask_no = #{where.hotdealAskNo}
+		</if>
+		<if test='where.hotdealNo != null and where.hotdealNo != ""' >
+			AND hotdeal_no = #{where.hotdealNo}
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND h.member_no = #{where.memberNo}
+		</if>
+
+    </select>
+	<update id="modify">
+		UPDATE hotdeal_ask
+		SET
+			memo = #{memo},
+			is_answer = #{isAnswer}
+
+		WHERE
+			hotdeal_ask_no = #{where.hotdealAskNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM hotdeal_ask
+		WHERE
+			hotdeal_ask_no = #{where.hotdealAskNo}
+    </delete>
+</mapper>

@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tender">
+    <resultMap type="com.suba.vo.TenderVO" id="TenderVO" />
+	<resultMap type="com.suba.vo.TenderReplyVO" id="TenderReplyVO" />
+    <resultMap type="com.suba.vo.TenderJoinVO" id="TenderJoinVO" />
+
+
+	<!-- 견적 총합 -->
+    <select id="total" resultType="int">
+    	SELECT COUNT(*) FROM tender t
+		WHERE
+			1 = 1
+		<if test='where.status != null and where.status != ""' >
+			AND t.status = #{where.status}
+		</if>
+		<if test='where.categoryNo2 != null and where.categoryNo2 != ""' >
+			AND t.category_no2 = #{where.categoryNo2}
+		</if>
+		<if test='where.categoryNo3 != null and where.categoryNo3 != ""' >
+			AND t.category_no3 = #{where.categoryNo3}
+		</if>
+		<if test='where.categoryNo4 != null and where.categoryNo4 != ""' >
+			AND t.category_no4 = #{where.categoryNo4}
+		</if>
+		<if test='where.buyType != null and where.buyType != ""' >
+			AND t.buy_type = #{where.buyType}
+		</if>
+		<if test='where.areaCode != null and where.areaCode != ""' >
+		  <choose>
+		  <when test='where.areaCode instanceof org.vertx.java.core.json.JsonArray'>
+			AND area_code IN
+			  <foreach item="item" collection="where.areaCode"
+			      open="(" separator="," close=")">
+			        #{item}
+			  </foreach>
+		  </when>
+		  <otherwise>
+			AND area_code = #{where.areaCode}
+		  </otherwise>
+		  </choose>
+		</if>
+		<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND t.reg_date >= #{where.startRegDate}
+		</if>
+		<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND t.reg_date &lt;= #{where.endRegDate}
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND t.member_no = #{where.memberNo}
+		</if>
+		<if test="where.startDate != null and where.startDate != '' " >
+			AND t.want_date >= #{where.startDate}
+		</if>
+		<if test="where.endDate != null and where.endDate != '' " >
+			AND t.want_date &lt;= #{where.endDate}
+		</if>
+		<if test="where.keyword != null and where.keyword != '' " >
+			AND t.title like CONCAT('%',#{where.keyword},'%')
+		</if>
+
+	</select>
+	<!-- 견적 리스트 -->
+    <select id="list" resultMap="TenderVO">
+		SELECT
+			tender_no,
+			t.reg_date,
+			t.status,
+			t.area_code,
+			t.category_no3,
+			t.category_no4,
+			t.buy_type,
+			t.content,
+			t.title,
+			t.reply_count,
+			t.member_no,
+			m.id,
+			bid_member_no,
+			want_date,
+			t.file_no1,
+			(SELECT id FROM member WHERE member_no = bid_member_no) bid_id,
+			(SELECT tender_count FROM tender_join WHERE tender_no = t.tender_no AND member_no = #{where.sessionMemberNo} LIMIT 1) is_tender
+
+		FROM
+			tender t
+			JOIN member m
+			ON t.member_no = m.member_no
+		WHERE
+			1 = 1
+
+
+		<if test='where.status != null and where.status != ""' >
+			AND t.status = #{where.status}
+		</if>
+		<if test='where.categoryNo2 != null and where.categoryNo2 != ""' >
+			AND t.category_no2 = #{where.categoryNo2}
+		</if>
+		<if test='where.categoryNo3 != null and where.categoryNo3 != ""' >
+			AND t.category_no3 = #{where.categoryNo3}
+		</if>
+		<if test='where.categoryNo4 != null and where.categoryNo4 != ""' >
+			AND t.category_no4 = #{where.categoryNo4}
+		</if>
+		<if test='where.buyType != null and where.buyType != ""' >
+			AND t.buy_type = #{where.buyType}
+		</if>
+		<if test='where.areaCode != null and where.areaCode != ""' >
+		  <choose>
+		  <when test='where.areaCode instanceof org.vertx.java.core.json.JsonArray'>
+			AND area_code IN
+			  <foreach item="item" collection="where.areaCode"
+			      open="(" separator="," close=")">
+			        #{item}
+			  </foreach>
+		  </when>
+		  <otherwise>
+			AND area_code = #{where.areaCode}
+		  </otherwise>
+		  </choose>
+		</if>
+		<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND t.reg_date >= #{where.startRegDate}
+		</if>
+		<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND t.reg_date &lt;= #{where.endRegDate}
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND t.member_no = #{where.memberNo}
+		</if>
+		<if test="where.startDate != null and where.startDate != '' " >
+			AND t.want_date >= #{where.startDate}
+		</if>
+		<if test="where.endDate != null and where.endDate != '' " >
+			AND t.want_date &lt;= #{where.endDate}
+		</if>
+		<if test="where.keyword != null and where.keyword != '' " >
+			AND t.title like CONCAT('%',#{where.keyword},'%')
+		</if>
+		ORDER BY tender_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <!-- 견적 상세 -->
+    <select id="selectTender" resultMap="TenderVO">
+		SELECT
+			tender_no,
+			t.reg_date,
+			status,
+			area_code,
+			t.category_no3,
+			t.category_no4,
+			buy_type,
+			content,
+			title,
+			reply_count,
+			t.member_no,
+			m.id,
+			bid_member_no,
+			want_date,
+			(SELECT id FROM member WHERE member_no = bid_member_no) bid_id,
+			t.file_no1,
+			t.file_no2,
+			t.file_no3,
+			t.file_no4,
+			t.file_no5,
+			t.grade
+		FROM
+			tender t
+			JOIN member m
+			ON t.member_no = m.member_no
+
+		WHERE
+			tender_no = #{where.tenderNo}
+	</select>
+    <select id="listExcel" resultType="java.util.LinkedHashMap">
+		SELECT
+			tender_no,
+			t.reg_date,
+			status,
+			area_code,
+			category_no,
+			content,
+			title,
+			reply_count,
+			t.member_no,
+			m.id,
+			bid_member_no,
+			want_date,
+			(SELECT id FROM member WHERE member_no = bid_member_no) bid_id,
+			f.file_no,
+			f.path
+		FROM
+			tender t
+			JOIN member m
+			ON t.member_no = m.member_no
+			JOIN file f
+			ON t.file_no = f.file_no
+
+		WHERE
+			1 = 1
+		<if test='where.categoryNo != null and where.categoryNo != ""' >
+			AND category_no = #{where.categoryNo}
+		</if>
+		<if test='where.areaCode != null and where.areaCode != ""' >
+			AND area_code = #{where.areaCode}
+		</if>
+		<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND t.reg_date >= #{where.startRegDate}
+		</if>
+		<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND t.reg_date &lt;= #{where.endRegDate}
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND t.member_no = #{where.memberNo}
+		</if>
+		<if test="where.title != null and where.title != ''" >
+			AND t.title like '%${where.title}%'
+		</if>
+
+
+		ORDER BY tender_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <!-- 견적 등록 -->
+	<insert id="insert">
+		INSERT INTO tender (
+			tender_no,
+			reg_date,
+			status,
+			area_code,
+			category_no2,
+			category_no3,
+			category_no4,
+			buy_type,
+			title,
+			content,
+			reply_count,
+			member_no,
+			bid_member_no,
+			want_date,
+			file_no1,
+			file_no2,
+			file_no3,
+			file_no4,
+			file_no5,
+			grade
+		)
+		VALUES (
+			#{tenderNo},
+			now(),
+			'T',
+			#{areaCode},
+			#{categoryNo2},
+			#{categoryNo3},
+			#{categoryNo4},
+			#{buyType},
+			#{title},
+			#{content},
+			0,
+			#{memberNo},
+			0,
+			#{wantDate},
+			#{fileNo1},
+			#{fileNo2},
+			#{fileNo3},
+			#{fileNo4},
+			#{fileNo5},
+			#{grade}
+		)
+	    <selectKey resultType="int" keyProperty="tenderNo" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+    </insert>
+    <!-- 입찰 카운트 증가 -->
+	<update id="plusHit">
+		UPDATE tender
+		SET reply_count = reply_count+1
+		WHERE
+			tender_no = #{where.tenderNo}
+
+	</update>
+	<!--  낙찰자 업데이트 -->
+	<update id="modifyBidMemberNo">
+		UPDATE tender
+		SET mid_member_no = #{midMemberNo}
+		WHERE
+			tender_no = #{where.tenderNo}
+
+	</update>
+	<!--  견적 상태 업데이트 -->
+	<update id="modifyStatus">
+		UPDATE tender
+		SET status = #{status}
+		WHERE
+			tender_no = #{where.tenderNo}
+
+	</update>
+    <!-- 입찰 정보 갱신 -->
+	<update id="modifyTender">
+		UPDATE tender
+		SET
+			reg_date = now(),
+			status = #{status},
+			area_code = #{areaCode},
+			category_no = #{categoryNo},
+			title = #{title},
+			content = #{content},
+			file_no1 = #{fileNo1},
+			file_no2 = #{fileNo2},
+			file_no3 = #{fileNo3},
+			file_no4 = #{fileNo4},
+			file_no5 = #{fileNo5}
+		WHERE
+			tender_no = #{where.tenderNo}
+    </update>
+    <!-- 입찰 삭제 -->
+    <delete id="delete">
+		DELETE FROM tender
+		WHERE
+			tender_no = #{where.tenderNo}
+    </delete>
+
+    <!-- 입찰 리스트 리스트  -->
+    <select id="selectTenderReplyList" resultMap="TenderReplyVO">
+		SELECT
+			tender_no,
+			tender_seq,
+			reg_date,
+			member_no,
+			contents,
+			f.file_no,
+			f.path
+		FROM
+			tender_reply t
+			JOIN file f
+			ON t.file_no = f.file_no
+		WHERE
+			tender_no = #{tenderNo}
+    </select>
+
+
+
+    <!-- 일반유저용 마이페이지 내용 -->
+    <select id="myTendingSummary" resultType="HashMap">
+    	SELECT COUNT(*) AS cnt, status
+			FROM tender
+
+		WHERE member_no = #{memberNo}
+		GROUP BY status
+	</select>
+	<!-- 일반유저 견적 리스트 견적번호만 얻음 -->
+    <select id="myTendingList" resultMap="TenderVO">
+		SELECT
+			tender_no,
+			reg_date,
+			status,
+			area_code,
+			category_no2,
+			category_no3,
+			category_no4,
+			content,
+			title,
+			reply_count,
+			member_no,
+			bid_member_no,
+			want_date
+		FROM
+			tender T
+
+
+		WHERE T.member_no = #{where.memberNo}
+			AND T.status = #{where.status}
+		GROUP BY category_no3;
+	</select>
+    <!-- 입찰중, 입찰완료, 입찰 만료 갯수 별 입찰 리스트 갯수 -->
+    <select id="myTendingTotal" resultType="int">
+		SELECT COUNT(*)
+		FROM
+			tender T
+
+		WHERE T.member_no = #{where.memberNo}
+			AND T.status = #{where.status}
+		<if test='where.categoryNo2 != null and where.categoryNo2 != ""' >
+			AND T.category_no2 = #{where.categoryNo2}
+		</if>
+
+	</select>
+    <!-- 입찰중, 입찰완료, 입찰 만료 입찰 번호  -->
+    <select id="myTendingNo" resultType="int">
+		SELECT tender_no
+		FROM
+			tender T
+
+		WHERE T.member_no = #{where.memberNo}
+			AND T.status = #{where.status}
+			AND T.category_no2 = #{where.categoryNo2}
+		LIMIT 1
+
+	</select>
+	<!-- 일반유저 입찰 리스트 : 10건으로 제한 -->
+    <select id="myTendingReplyList" resultMap="TenderReplyVO">
+		SELECT TR.tender_no, TR.tender_seq, TR.reg_date, TR.member_no, TR.contents, M.id
+		FROM
+			tender_reply TR
+			JOIN tender T
+			ON TR.tender_no = T.tender_no
+			JOIN member M
+			ON TR.member_no = M.member_no
+
+		WHERE TR.tender_no = #{where.tenderNo}
+		ORDER BY tender_seq DESC
+		LIMIT 10
+	</select>
+
+    <select id="myTendingList_back" resultMap="TenderVO">
+		SELECT
+			T.tender_no,
+			T.reg_date,
+			T.area_code,
+			T.category_no2,
+			T.title,
+			T.member_no,
+			M.id,
+			T.bid_member_no,
+			T.want_date
+
+		FROM
+			tender_join TJ
+			JOIN tender T
+			ON TJ.tender_no = T.tender_no
+			JOIN member M
+			ON T.member_no = M.member_no
+
+		WHERE TJ.member_no = #{where.memberNo}
+			AND TJ.tender_status = #{where.status}
+
+		ORDER BY TJ.tender_no DESC
+
+		LIMIT
+			#{start}, #{len}
+
+	</select>
+
+
+
+    <!-- 딜러용 마이페이지 내용 -->
+
+	<!-- 입찰 참여수 입찰수 낙찰수 등을 집계하는 쿼리 -->
+   <select id="selectMyTenderStats" resultType="HashMap">
+		SELECT 	SUM(tender_count) AS total,
+			COUNT(tender_count) AS  cnt,
+			SUM(tender_bid) AS successCnt
+
+			FROM tender_join
+			WHERE member_no = #{memberNo}
+    </select>
+
+
+    <!-- 딜러용 마이페이지 입찰중, 입찰완료, 입찰 만료 갯수 -->
+    <select id="dealerMyTendingSummary" resultType="HashMap">
+		SELECT TJ.tender_status AS status, COUNT(*) AS cnt
+		FROM
+			tender_join TJ
+
+		WHERE TJ.member_no = #{memberNo}
+		GROUP BY TJ.tender_status
+
+	</select>
+    <!-- 입찰중, 입찰완료, 입찰 만료 갯수 별 입찰 리스트 갯수 -->
+    <select id="dealerMyTendingTotal" resultType="int">
+		SELECT COUNT(*)
+		FROM
+			tender_join TJ
+
+		WHERE TJ.member_no = #{where.memberNo}
+			AND TJ.tender_status = #{where.status}
+
+	</select>
+    <!-- 입찰중, 입찰완료, 입찰 만료 갯수 별  입찰 리스트 -->
+    <select id="dealerMyTendingList" resultMap="TenderVO">
+		SELECT
+			T.tender_no,
+			T.reg_date,
+			T.area_code,
+			T.category_no2,
+			T.category_no3,
+			T.category_no4,
+			T.title,
+			T.member_no,
+			M.id,
+			T.bid_member_no,
+			T.want_date
+
+		FROM
+			tender_join TJ
+			JOIN tender T
+			ON TJ.tender_no = T.tender_no
+			JOIN member M
+			ON T.member_no = M.member_no
+
+		WHERE TJ.member_no = #{where.memberNo}
+			AND TJ.tender_status = #{where.status}
+
+		ORDER BY TJ.tender_no DESC
+
+		LIMIT
+			#{start}, #{len}
+
+	</select>
+
+
+</mapper>

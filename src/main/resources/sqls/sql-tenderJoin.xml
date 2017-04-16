@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tenderJoin">
+
+	<insert id="insert">
+	
+		INSERT INTO tender_join (
+			tender_no,
+			member_no,
+			tender_count,
+			tender_status,
+			tender_bid,
+			tender_member_no
+		) VALUES (
+ 			#{tenderNo},
+			#{memberNo},
+			1,
+			'T',
+			0,
+			#{tenderMemberNo}
+		) ON DUPLICATE KEY UPDATE
+			tender_count = tender_count+1
+	
+    </insert>
+	<update id="success">
+	
+		UPDATE tender_join 
+		SET 
+			tender_status = 'S',
+			tender_bid = Case
+				When member_no = #{memberNo} Then 1 
+				When member_no != #{memberNo} Then 0
+			End
+		WHERE 
+			tender_no = #{tenderNo}
+	
+    </update>
+    <!--  보류 -->
+	<update id="defer">
+	
+		UPDATE tender_join 
+		SET 
+			tender_status = 'D'
+		WHERE 
+			tender_no = #{tenderNo}
+    </update>
+    
+
+</mapper>

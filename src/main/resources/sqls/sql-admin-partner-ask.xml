@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin_partner_ask">
+    <resultMap type="com.suba.vo.PartnerAskVO" id="partnerAskVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM partner_ask
+    	WHERE
+    		1=1
+		<if test='where.name != null and where.name != ""' >
+			AND name like '%${where.name}%'
+		</if>
+		<if test="where.mobile != null and where.mobile != ''" >
+			AND mobile like '%${where.mobile}%'
+		</if>
+		<if test="where.email != null and where.email != ''" >
+			AND email = '%${where.email}%'
+		</if>
+	</select>
+    <select id="list" resultMap="partnerAskVO">
+		SELECT
+			partner_ask_no,
+			name,
+			mobile,
+			email,
+			reg_date
+		FROM
+			partner_ask
+    	WHERE
+    		1=1
+		<if test='where.name != null and where.name != ""' >
+			AND name like '%${where.name}%'
+		</if>
+		<if test="where.mobile != null and where.mobile != ''" >
+			AND mobile like '%${where.mobile}%'
+		</if>
+		<if test="where.email != null and where.email != ''" >
+			AND email = '%${where.email}%'
+		</if>
+		ORDER BY partner_ask_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="partnerAskVO">
+		SELECT
+			partner_ask_no,
+			name,
+			mobile,
+			email,
+			reg_date,
+			comment,
+			memo
+		FROM
+			partner_ask
+    	WHERE
+    		1=1
+		<if test='where.partnerAskNo != null and where.partnerAskNo != ""' >
+			AND partner_ask_no = #{where.partnerAskNo}
+		</if>
+
+    </select>
+	<update id="modify">
+		UPDATE partner_ask
+		SET
+			memo = #{memo}
+
+		WHERE
+			partner_ask_no = #{where.partnerAskNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM partner_ask
+		WHERE
+			partner_ask_no = #{where.partnerAskNo}
+    </delete>
+</mapper>

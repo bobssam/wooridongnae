@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin_main_banner">
+    <resultMap type="com.suba.vo.MainBannerVO" id="mainBannerVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM main_banner
+    	WHERE
+    		1=1
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		<if test='where.isUse != null and where.isUse != ""' >
+			AND is_use = #{where.isUse}
+		</if>
+
+	</select>
+    <select id="list" resultMap="mainBannerVO">
+		SELECT
+			main_banner_no,
+			reg_date,
+			title,
+			file_no,
+			is_use
+		FROM
+			main_banner
+    	WHERE
+    		1=1
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		<if test='where.isUse != null and where.isUse != ""' >
+			AND is_use = #{where.isUse}
+		</if>
+		ORDER BY main_banner_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="mainBannerVO">
+		SELECT
+			main_banner_no,
+			reg_date,
+			title,
+			file_no,
+			is_use,
+			url
+		FROM
+			main_banner
+    	WHERE
+			main_banner_no = #{where.mainBannerNo}
+    </select>
+	<insert id="add">
+		INSERT INTO main_banner(
+			title,
+			file_no,
+			is_use,
+			reg_date,
+			url
+		)
+		VALUES (
+			#{title},
+			#{fileNo},
+			#{isUse},
+			NOW(),
+			#{url}
+		)
+    </insert>
+	<update id="modify">
+		UPDATE main_banner
+		SET
+			title = #{title},
+			file_no = #{fileNo},
+			is_use = #{isUse},
+			url = #{url}
+
+		WHERE
+			main_banner_no = #{where.mainBannerNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM main_banner
+		WHERE
+			main_banner_no = #{where.mainBannerNo}
+    </delete>
+</mapper>

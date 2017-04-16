@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var $tbody = $body.find('table.list tbody');
+	var category = {};
+
+	function getCateName( no ) {
+		return category[no];
+	}
+	window.getCateName = getCateName;
+
+	$body.makeCheckAll();
+	$body.find('[name=isUse]').options({'':'전체', 'Y':'사용', 'N':'비사용'});
+
+	$body.find('[name=category]').optionsApi({
+			api: '/api/boardCategory',
+			key: 'categoryNo',
+			value: 'categoryName',
+			filter: {boardType:'faq'}
+		}, function( datas ){
+			category = datas;
+		board.load();
+	});
+
+
+	var board = $tbody.board({
+		page: 1,
+		len: 10,
+		api: '/api/faq/',
+		template: $body.find('.tmpl_qna'),
+		paging: $body.find('.pageing'),
+		onRender : function( $tar, datas ) {
+
+			// 수정
+			$tar.find('button').on('click', function(){
+				datas.parent = board;
+				datas.cate = category;
+				datas.callback = function(res, datas) {
+					if( res ) {
+						board.reload();
+						$dialog.dialog('close');
+						toastr.success('수정 성공');
+					}
+				}
+
+				var $dialog = $.loadDialog({
+					popup: 'guide/faq',
+					data:datas,
+					width:'auto',
+				});
+			});
+		}
+	});
+
+	$body.find('button.del').on('click', function(){
+
+		var $list = $body.find('input[type=checkbox]:checked');
+		if( $list.length > 0 && confirm('선택된 글을 삭제하시겠습니까?') ) {
+
+			var docount = $list.length;
+			$list.each(function(i){
+
+				var $this = $(this).closest('tr');
+				var data = $this.data('data');
+
+				board.remove(data, function(res, datas){
+					if( res ) {
+						toastr.success( '삭제됨' );
+						comp.reload();
+					}
+					if( --docount == 0 )
+						comp.reload();
+				});
+
+			});
+		}
+	});
+
+	// 신규
+	$body.find('button.add').on('click', function(){
+		var data = {type:'new', parent:board, cate:category};
+		var $dialog = null;
+		data.callback = function(res, datas) {
+			if( res ) {
+				$dialog.dialog('close');
+				board.reload();
+				toastr.success( '코드 추가 성공' );
+			}
+		};
+
+		$dialog = $.loadDialog({
+			title: '신규등록',
+			popup:'guide/faq',
+			width:'auto',
+			data:data
+		});
+	});
+
+	$body.find('form').on('submit', function(){
+		board.setFilter($(this).formData());
+		board.load();
+		return false;
+	});
+	$body.find('form').trigger('submit');
+
+});
+
+</script>
+</head>
+<body>
+
+
+
+	<form class="search">
+		<table>
+			<tr>
+				<th>사용여부</th>
+				<td><select name="isUse"></select></td>
+				<th>제목</th>
+				<td><input type="text" name="title" size="50"></td>
+				<td rowspan="2" class="btns">
+					<button type="button" class="img clear">초기화</button><br/>
+					<button type="submit" class="img search">검색하기</button>
+				</td>
+			</tr>
+			<tr>
+				<th>카테고리</th>
+				<td><select name="category"></select></td>
+				<th>답변</th>
+				<td><input type="text" name="answer" size="50"></td>
+
+			</tr>
+
+		</table>
+
+	</form>
+
+	<div class="data_grid">
+
+		<div class="header">
+			<button type="button" class="btn add">등록하기</button>
+			<button type="button" class="btn red del">삭제하기</button>
+			<button type="button" class="btn green"><i class="fa fa-file-excel-o"></i> 엑셀 다운로드</button>
+		</div>
+
+		<div class="pageing"></div>
+		<table class="list">
+			<thead>
+				<tr>
+					<th width="30"><input name="check" type="checkbox"></th>
+					<th width="30">번호</th>
+					<th width="120">등록일</th>
+					<th>제목</th>
+					<th width="50">카테고리</th>
+					<th width="30">사용여부</th>
+					<th width="40">조회수</th>
+					<th width="50"></th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div class="pageing"></div>
+	</div>
+
+<script type="text/html" class="tmpl_qna">
+<tr>
+	<td><input name="check" type="checkbox"></td>
+	<td>${boardNo}</td>
+	<td>${timeConv(regDate)}</td>
+	<td class="text">${title}</td>
+	<td>${getCateName(category)}</td>
+	<td>${isUse}</td>
+	<td>${hits}</td>
+	<td><button type="button" class="btn ssmall">수정</button></td>
+</tr>
+</script>
+
+</body>
+</html>

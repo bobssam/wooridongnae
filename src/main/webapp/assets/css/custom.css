@@ -1,0 +1,85 @@
+/* Add here all your css styles (customizations) */
+
+.breadcrumbs {
+	padding: 0;
+}
+.topbar .loginbar.pull-right {
+	padding-left: 5px;
+}
+
+
+@media (max-width: 768px){
+	.footer-v1 .footer{
+		padding: 0;
+	}
+	.tender_list {
+		height: 100px !important;
+	}
+	.tender_list.list3{
+		background-position: 30% 50% !important;
+		background-size: auto 100% !important;
+	}
+}
+
+label.error{
+	color:#F00;
+}
+
+.area label {
+
+	margin: 5px;
+}
+
+table tr.readed  td, table tr.readed a {
+	color:#999;
+}
+
+.reg-page {
+	padding: 20px !important;
+}
+.content   {
+	min-height: 600px;
+}
+
+.tender_list{
+	height: 120px;
+	margin-top: -5px;
+}
+.tender_list h2{
+	color:#FFF;
+	font-size: 32px;
+	height: 110px;
+	line-height: 110px;
+	padding-left: 5%;
+	float:left;
+}
+
+.tender_list.list3{
+	background:#12262f url(../img/tender/tender_bg1.jpg) no-repeat 30% 50%;
+}
+.tender_list.list3 .object{
+	display: none;
+}
+
+.tender_list.list4{
+	background:#316722 url(../img/tender/tender_bg2.jpg) no-repeat 70% 50%;
+}
+.tender_list.list4 .object{
+	display: none;
+}
+
+
+
+.tender_list.list2{
+	background:#011017 url(../img/tender/tender_bg2.jpg) no-repeat 50% 50%;
+}
+.tender_list.list2 .object{
+	width: 150px;
+	height: 120px;
+	border: 0;
+	background: url(../img/tender/tender2.png) no-repeat 50% 30%;
+	background-size: 180px 162px;
+	float: right;
+	margin-right: 5%;
+}
+

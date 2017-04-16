@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="payment">
+    <resultMap type="com.suba.vo.PaymentVO" id="PaymentVO" />
+    <select id="total" resultType="int">
+    	SELECT COUNT(*) FROM payment p
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND p.member_no = #{where.memberNo}
+			</if>
+			<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND p.payment_date >= #{where.startRegDate}
+			</if>
+			<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND p.payment_date &lt;= #{where.endRegDate}
+			</if>
+
+	</select>
+    <select id="list" resultMap="PaymentVO">
+		SELECT
+			payment_no,
+			p.member_no,
+			m.id,
+			payment_date,
+			price,
+			order_type,
+			order_no,
+			parent_no
+		FROM
+			payment p
+			JOIN member m
+			ON p.member_no = m.member_no
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND p.member_no = #{where.memberNo}
+			</if>
+			<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND p.payment_date >= #{where.startRegDate}
+			</if>
+			<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND p.payment_date &lt;= #{where.endRegDate}
+			</if>
+
+		ORDER BY p.payment_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="insert">
+		INSERT INTO payment (
+			payment_no,
+			member_no,
+			payment_date,
+			price,
+			order_type,
+			order_no,
+			parent_no
+		)
+		VALUES (
+			#{paymentNo},
+			#{memberNo},
+			now(),
+			#{price},
+			#{orderType},
+			#{orderNo},
+			#{parent_no}
+		)
+    </insert>
+	<update id="modify">
+		UPDATE payment
+		SET
+			member_no = #{memberNo},
+			payment_date = now(),
+			price = #{price},
+			order_type = #{orderType},
+			order_no = #{orderNo},
+			parent_no = #{parentNo}
+		WHERE
+			payment_no = #{paymentNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM payment
+		WHERE
+			payment_no = #{paymentNo}
+    </delete>
+</mapper>

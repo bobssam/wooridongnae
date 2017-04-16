@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="crop">
+    <resultMap type="com.suba.vo.CropVO" id="cropVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM crop
+		<trim prefixOverrides="AND | OR" prefix="WHERE">
+			<if test="where.bigAreaNo !=  null and where.bigAreaNo !=  ''">
+			AND big_area_no = #{where.bigAreaNo}
+			</if>
+			<if test="where.smallAreaNo !=  null and where.smallAreaNo !=  ''">
+			AND small_area_no = #{where.smallAreaNo}
+			</if>
+		</trim>
+
+	</select>
+    <select id="list" resultMap="cropVO">
+		SELECT
+			m.corp_name,
+			m.name,
+			m.push_yn,
+			c.crop_cate,
+			c.crop_goods,
+			c.represent,
+			c.address,
+			c.mobile,
+			c.phone,
+			c.homepage,
+			c.dc,
+			c.reg_date,
+			c.member_no,
+			c.title,
+			c.opening_hour,
+			c.big_area_no,
+			c.small_area_no,
+			c.file_no,
+			(SELECT big_area_name FROM big_area WHERE big_area_no = c.big_area_no) AS big_area_name,
+			(SELECT small_area_name FROM small_area WHERE small_area_no = c.small_area_no AND big_area_no = c.big_area_no) AS small_area_name,
+			c.hits,
+			m.id,
+			m.category_no3,
+			(SELECT category_name FROM category WHERE category_no = category_no3) AS category_no3_name
+
+		FROM
+			crop c
+			JOIN member m
+			ON c.member_no = m.member_no
+		<if test="where.categoryNo3 != null and where.categoryNo3 != ''">
+			INNER JOIN member_category_no3 AS mc
+			ON m.member_no = mc.member_no
+		</if>
+
+
+
+		<trim prefixOverrides="AND | OR" prefix="WHERE">
+
+			AND m.category_no1 = 1 AND m.category_no2 = 4
+
+			<if test="where.bigAreaNo !=  null and where.bigAreaNo !=  ''">
+			AND big_area_no = #{where.bigAreaNo}
+			</if>
+			<if test="where.smallAreaNo !=  null and where.smallAreaNo !=  ''">
+			AND small_area_no = #{where.smallAreaNo}
+			</if>
+			<if test="where.categoryNo3 != null and where.categoryNo3 != ''">
+			AND mc.category_no IN (
+				<choose>
+				<when  test="@com.suba.util.Mybatis@isArray(where.categoryNo3)">
+				<foreach collection="where.categoryNo3" item="cate" separator=",">#{cate}</foreach>
+				</when>
+				<otherwise>
+				#{where.categoryNo3}
+				</otherwise>
+				</choose>
+			)
+			</if>
+		</trim>
+
+		ORDER BY member_no DESC
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="cropVO">
+		SELECT
+			m.corp_name,
+			m.name,
+			m.name,
+			m.push_yn,
+			c.crop_cate,
+			c.crop_goods,
+			c.represent,
+			c.address,
+			c.mobile,
+			c.phone,
+			c.homepage,
+			c.dc,
+			c.reg_date,
+			c.member_no,
+			c.title,
+			c.opening_hour,
+			c.big_area_no,
+			c.small_area_no,
+			c.hits,
+			c.content,
+			c.file_no,
+			m.id,
+			m.category_no3,
+			(SELECT category_name FROM category WHERE category_no = m.category_no3) AS category_no3_name
+
+		FROM
+			crop c
+			JOIN member m
+			ON c.member_no = m.member_no
+		WHERE
+			m.member_no = #{memberNo}
+		LIMIT 1
+    </select>
+	<insert id="insert">
+		INSERT INTO crop(
+			crop_cate,
+			crop_goods,
+			represent,
+			address,
+			mobile,
+			phone,
+			homepage,
+			dc,
+			reg_date,
+			member_no,
+			title,
+			content,
+			opening_hour,
+			big_area_no,
+			small_area_no,
+			file_no
+		)
+		VALUES (
+			#{cropCate},
+			#{cropGoods},
+			#{represent},
+			#{address},
+			#{mobile},
+			#{phone},
+			#{homepage},
+			#{dc},
+			NOW(),
+			#{memberNo},
+			#{title},
+			#{content},
+			#{openingHour},
+			#{bigAreaNo},
+			#{smallAreaNo},
+			#{fileNo}
+		)
+    </insert>
+	<update id="modify">
+		UPDATE crop
+		SET
+			crop_cate = #{cropCate},
+			crop_goods = #{cropGoods},
+			represent = #{represent},
+			address = #{address},
+			mobile = #{mobile},
+			phone = #{phone},
+			homepage = #{homepage},
+			dc = #{dc},
+			title = #{title},
+			content = #{content},
+			opening_hour = #{openingHour},
+			big_area_no = #{bigAreaNo},
+			small_area_no = #{smallAreaNo},
+			file_no = #{fileNo}
+
+		WHERE
+			member_no = #{where.memberNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM crop
+		WHERE
+			member_no = #{where.memberNo}
+    </delete>
+    <update id="plusHit">
+		UPDATE crop
+		SET
+			hits = hits+1
+		WHERE
+			member_no = #{where.memberNo}
+    </update>
+    <select id="mainList" resultMap="cropVO">
+		SELECT
+			c.member_no,
+			m.corp_name,
+			c.file_no
+		FROM
+			crop c
+			JOIN member m
+			ON c.member_no = m.member_no
+
+		ORDER BY c.member_no DESC
+		LIMIT
+			0, 4
+    </select>
+</mapper>

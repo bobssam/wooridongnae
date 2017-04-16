@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="certification">
+	<insert id="insertCertificationKey" >
+		INSERT INTO certification_tempkey (
+			phone,
+			tempkey
+		)
+		VALUES (
+			#{phone},
+			#{tempKey}
+		)
+	</insert>
+	<select id="getTempKey" resultType="String">
+		SELECT tempKey
+		FROM certification_tempkey
+		WHERE phone = #{phone}
+	</select>
+	<delete id="deleteTempKey" >
+		DELETE FROM certification_tempkey
+		WHERE phone = #{phone}
+	</delete>
+</mapper>

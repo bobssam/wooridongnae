@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var url = '/api/mainbanner/modify';
+	var data = obj.data;
+
+	$body.find('select[name=isUse]').options({'Y':'사용','N':'미사용'});
+
+	// 신규
+	if( obj.data.type == 'new' ) {
+		$body.find('input[name=codeSeq]').disabled();
+		$body.find('.onlyModify').remove();
+	} else {
+
+		$.ajax({
+			url : apiRoot+ '/api/mainbanner/view',
+			data : {where: JSON.stringify({mainBannerNo:obj.data.mainBannerNo})},
+			dataType: 'json',
+			async: false,
+			success:function(datas) {
+				if( datas.status == 'ok' ) {
+					data = datas.data;
+					$body.formData(data);
+				}
+			}
+		});
+	}
+
+	$body.find('form').on('submit', function(){
+		var datas = $body.formData();
+		if( obj.data.type == 'new' )
+			obj.data.parent.add( datas, obj.data.callback );
+		else
+			obj.data.parent.modify( {mainBannerNo:datas.mainBannerNo}, datas, obj.data.callback );
+		return false;
+
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+
+
+	/*****************************************************
+					파일 업로더 구현
+	*****************************************************/
+	var prevFile = null;
+	$body.find('input[name=file]').fileupload({
+        url: apiRoot+'/api/file/upload/',
+        autoUpload : true,
+        imageMaxWidth: 300,
+        imageMaxHeight: 200,
+
+    }).on('fileuploadadd', function(e, data){
+
+        var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
+        if(!data.originalFiles[0]['type'] || !acceptFileTypes.test(data.originalFiles[0]['type'])) {
+            toastr.error('이미지 파일만 올릴 수 있습니다.');
+            return false;
+        }
+        if(data.originalFiles[0]['size'] && data.originalFiles[0]['size'] > 1000000) {
+            toastr.error('1메가 이하의 이미지를 올려주세요.');
+            return false;
+        }
+
+    }).on('fileuploaddone', function(e, data){
+    	if( data.result.status == 'ok' ) {
+    		var fileNo = data.result.data.fileNo;
+    		$body.find('[name=fileNo]').val(fileNo);
+    		fileModeChange('uploaded');
+    		$body.find('img').attr('src', apiRoot+'/api/file/download/'+fileNo);
+    	}
+    });
+
+	function fileModeChange( mode ) {
+		$body.find('.file').hide();
+		$body.find('.file.'+mode).show();
+	}
+	fileModeChange('upload');
+
+	$body.find('.del_img').on('click', function(){
+		$body.find('[name=fileNo]').val(0);
+		fileModeChange('upload');
+	});
+
+	if( data.fileNo ) {
+		fileModeChange('uploaded');
+		$body.find('img').attr('src', apiRoot+'/api/file/download/'+data.fileNo);
+	}
+
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<input type="hidden" name="boardType" value="mainbanner">
+	<input type="hidden" name="fileNo" value="0">
+
+	<table>
+	<caption>데이터 수정</caption>
+	<tr class="onlyModify">
+		<th>번호</th>
+		<td><input name="mainBannerNo" type="text" readonly="readonly"></td>
+	</tr>
+	<tr class="onlyModify">
+		<th>등록일</th>
+		<td data-name="regDate" data-formatter="timeConv"></td>
+	</tr>
+	<tr>
+		<th>사용여부</th>
+		<td><select name="isUse"></select></td>
+	</tr>
+	<tr>
+		<th>제목</th>
+		<td><input name="title" type="text" size="70"></td>
+	</tr>
+	<tr>
+		<th>링크</th>
+		<td><input name="url" type="text" size="70"></td>
+	</tr>
+	<tr>
+		<th>배너 이미지</th>
+		<td>
+			<p class="guide">가로 1200px 세로 400px 이미지로 올려주세요</p>
+
+			<div class="file upload">
+				<input type="file" name="file">
+			</div>
+			<div class="file uploaded"> <button type="button" class="del_img">이미지삭제</button><br/>
+				<img class="auto_size">
+			</div>
+		</td>
+	</tr>
+
+	</table>
+	<div class="btns">
+
+		<button type="submit" class="btn confirm">수정</button>
+		<button type="button" class="btn gray cancel">취소</button>
+
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="note">
+    <resultMap type="com.suba.vo.NoteVO" id="noteVO"/>
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM note n
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND n.member_no = #{where.memberNo}
+			</if>
+			<if test="where.read != null ">
+			AND n.read = #{where.read}
+			</if>
+	</select>
+    <select id="list" resultMap="noteVO">
+		SELECT
+			note_no,
+			n.member_no,
+			m.id,
+			sender_no,
+			n.reg_date,
+			content,
+			n.read,
+			n.point
+		FROM
+			note n
+			JOIN member m
+			ON n.member_no = m.member_no
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND n.member_no = #{where.memberNo}
+			</if>
+			<if test="where.read != null ">
+			AND n.read = #{where.read}
+			</if>
+		ORDER BY note_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="sendNote">
+		INSERT INTO note(
+			member_no,
+			sender_no,
+			reg_date,
+			content,
+			`read`,
+			point
+		)
+		VALUES (
+			#{memberNo},
+			#{senderNo},
+			NOW(),
+			#{content},
+			0,
+			#{point}
+		)
+    </insert>
+	<insert id="replyNote">
+		INSERT INTO note(
+			member_no,
+			sender_no,
+			reg_date,
+			content,
+			`read`
+		)
+		SELECT 
+			sender_no,
+			#{where.memberNo},
+			NOW(),
+			#{data.content},
+			0
+			FROM note
+			WHERE note_no = #{where.noteNo}
+
+    </insert>
+	<update id="receivePoint">
+
+		UPDATE member m INNER JOIN note t ON
+			m.member_no=t.member_no
+
+			SET m.point = m.point + t.point
+				, t.read = 1
+		WHERE t.note_no = #{where.noteNo}
+			AND t.read = 0
+
+    </update>
+
+	<update id="readNote">
+		UPDATE note
+		SET
+			`read` = 1
+		WHERE
+			note_no = #{where.noteNo}
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND member_no = #{where.memberNo}
+			</if>
+    </update>
+    <delete id="delete">
+		DELETE FROM note
+		WHERE
+			note_no = #{where.noteNo}
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND member_no = #{where.memberNo}
+			</if>		
+
+    </delete>
+</mapper>

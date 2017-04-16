@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+var noteReadMap = {0:'안읽음', 1:'읽음'};
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var $tbody = $body.find('tbody');
+
+	if( obj.data.isPopup ) {
+		$body.find('form').hide();
+	}
+
+	var board = $tbody.board({
+		page: 1,
+		len: 10,
+		api: '/api/note/',
+		template: $body.find('.tmpl_notice'),
+		paging: $body.find('.pageing'),
+		onRender : function( $tar, datas ) {
+
+			// 수정
+			$tar.find('button').on('click', function(){
+				datas.parent = board;
+				datas.callback = function(res, datas) {
+					if( res ) {
+						board.reload();
+						$dialog.dialog('close');
+						toastr.success('수정 성공');
+					}
+				}
+
+				var $dialog = $.loadDialog({
+					title: '노트 상세 정보',
+					popup: 'note/view',
+					data:datas,
+					width:'auto',
+				});
+			});
+		}
+	});
+	if( obj.data.filter ) board.setFilter(obj.data.filter);
+
+	$body.find('button.del').on('click', function(){
+
+		var $list = $body.find('input[type=checkbox]:checked');
+		if( $list.length > 0 && confirm('선택된 글을 삭제하시겠습니까?') ) {
+
+			var docount = $list.length;
+			$list.each(function(i){
+
+				var $this = $(this).closest('tr');
+				var data = $this.data('data');
+
+				board.remove(data, function(res, datas){
+					if( res ) {
+						toastr.success( '삭제됨' );
+						board.reload();
+					}
+					if( --docount == 0 )
+						board.reload();
+				});
+
+			});
+		}
+	});
+
+	$body.find('form').on('submit', function(){
+		board.setFilter($(this).formData());
+		board.load();
+		return false;
+	});
+	$body.find('form').trigger('submit');
+
+});
+
+</script>
+</head>
+<body>
+
+
+
+	<div class="data_grid">
+
+		<div class="header">
+			<button type="button" class="btn red del">삭제하기</button>
+		</div>
+
+		<div class="pageing"></div>
+		<table class="list">
+			<thead>
+				<tr>
+					<th width="30"><input name="check" type="checkbox"></th>
+					<th width="30">번호</th>
+					<th width="150">등록일</th>
+					<th width="50">발송자</th>
+					<th width="30">확인여부</th>
+					<th width="40">포인트</th>
+					<th>내용</th>
+
+					<th width="50"></th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div class="pageing"></div>
+	</div>
+
+<script type="text/html" class="tmpl_notice">
+<tr>
+	<td><input name="check" type="checkbox"></td>
+	<td>${noteNo}</td>
+	<td>${timeConv(regDate)}</td>
+	<td>${senderNo}</td>
+	<td>${noteReadMap[read]}</td>
+	<td>${point}</td>
+	<td class="text">${content}</td>
+	<td><button type="button" class="btn ssmall">상세보기</button></td>
+</tr>
+</script>
+
+</body>
+</html>

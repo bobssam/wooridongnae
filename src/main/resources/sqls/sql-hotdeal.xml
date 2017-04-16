@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hotdeal">
+    <resultMap type="com.suba.vo.HotdealVO" id="hotdealVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM hotdeal
+    	WHERE
+    		is_use = 'Y'
+	</select>
+    <select id="list" resultMap="hotdealVO">
+		SELECT
+			hotdeal_no,
+			file_no,
+			model,
+			title,
+			reg_date,
+			comment,
+			(SELECT hotdeal_ask_no FROM hotdeal_ask WHERE hotdeal_no = hotdeal.hotdeal_no AND member_no = #{where.memberNo} LIMIT 1 ) hotdeal_ask_no
+
+		FROM
+			hotdeal
+    	WHERE
+    		is_use = 'Y'
+    	ORDER BY hotdeal_no DESC
+   	</select>
+    <select id="mainList" resultMap="hotdealVO">
+		SELECT
+			hotdeal_no,
+			file_no,
+			model,
+			title,
+			reg_date
+		FROM
+			hotdeal
+    	WHERE
+    		is_use = 'Y'
+    	ORDER BY hotdeal_no DESC
+    	LIMIT 4
+   	</select>
+    <select id="view" resultMap="hotdealVO">
+		SELECT
+			hotdeal_no,
+			file_no,
+			model,
+			title,
+			comment,
+			reg_date,
+			(SELECT hotdeal_ask_no FROM hotdeal_ask WHERE hotdeal_no = #{hotdealNo} AND member_no = #{memberNo} LIMIT 1 ) hotdeal_ask_no
+		FROM
+			hotdeal
+    	WHERE
+    		is_use = 'Y'
+    		AND hotdeal_no = #{hotdealNo}
+   	</select>
+   	<update id="plusAsk">
+   		UPDATE hotdeal
+   			SET ask_count = ask_count +1
+
+    	WHERE
+			hotdeal_no = #{hotdealNo}
+   	</update>
+</mapper>

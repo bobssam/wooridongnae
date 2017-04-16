@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="bigArea">
+    <resultMap type="BigAreaVO" id="bigAreaVO">
+		<result property="bigAreaNo" column="big_area_no"/>
+		<result property="bigAreaName" column="big_area_name"/>
+	</resultMap>
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM big_area
+
+	</select>
+    <select id="list" resultMap="bigAreaVO">
+		SELECT
+			big_area_no,
+			big_area_name
+		FROM
+			big_area
+		ORDER BY big_area_no ASC
+    </select>
+    <select id="view" resultMap="bigAreaVO">
+		SELECT
+			big_area_no,
+			big_area_name
+		FROM
+			big_area
+		WHERE
+			big_area_no = #{where.bigAreaNo}
+    </select>
+	<insert id="insert">
+		INSERT INTO big_area(
+			big_area_name
+		)
+		VALUES (
+			#{bigAreaName}
+		)
+    </insert>
+	<update id="modify">
+		UPDATE big_area
+		SET
+			big_area_name = #{bigAreaName}
+
+		WHERE
+			big_area_no = #{where.bigAreaNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM big_area
+		WHERE
+			big_area_no = #{where.bigAreaNo}
+    </delete>
+</mapper>

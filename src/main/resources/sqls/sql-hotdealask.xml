@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hotdealask">
+    <resultMap type="com.suba.vo.HotdealAskVO" id="hotdealAskVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM hotdeal_ask
+    	WHERE
+		<if test="where.hotdealNo != null and where.hotdealNo != ''" >
+			AND hotdeal_no = #{where.hotdealNo}
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND member_no = #{where.memberNo}
+		</if>
+		<if test="where.hotdealAskNo != null and where.hotdealAskNo != ''" >
+			AND hotdeal_ask_no = #{where.hotdealAskNo}
+		</if>
+
+	</select>
+    <select id="view" resultMap="hotdealAskVO">
+		SELECT
+			ha.hotdeal_ask_no,
+			ha.mobile,
+			ha.area,
+			ha.want_date,
+			ha.buy_type,
+			ha.pre_price,
+			ha.contract_duration,
+			ha.ask,
+			ha.reg_date,
+			ha.member_no,
+			h.title
+		FROM
+			hotdeal_ask ha
+			INNER JOIN hotdeal h
+			ON ha.hotdeal_no = h.hotdeal_no
+    	WHERE
+			ha.member_no = #{memberNo}
+			AND ha.hotdeal_no = #{hotdealNo}
+		LIMIT 1
+   	</select>
+   	<insert id="add">
+   		INSERT INTO hotdeal_ask (
+   			hotdeal_ask_no,
+			mobile,
+			area,
+			want_date,
+			buy_type,
+			pre_price,
+			contract_duration,
+			ask,
+			reg_date,
+   			hotdeal_no,
+			member_no
+		) VALUES (
+			#{hotdealAskNo},
+			#{mobile},
+			#{area},
+			#{wantDate},
+			#{buyType},
+			#{prePrice},
+			#{contractDuration},
+			#{ask},
+			NOW(),
+			#{hotdealNo},
+			#{memberNo}
+		)
+   	</insert>
+   	<delete id="delete">
+   		DELETE FROM hotdeal_ask
+    	WHERE
+			member_no = #{memberNo}
+			AND hotdeal_no = #{hotdealNo}
+   	</delete>
+</mapper>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var $tbody = $body.find('.data_grid tbody');
+
+	$body.makeCheckAll();
+
+	var board = $tbody.board({
+		page: 1,
+		len: 10,
+		api: '/api/notice/',
+		template: $body.find('.tmpl_notice'),
+		paging: $body.find('.pageing'),
+		onRender : function( $tar, datas ) {
+
+			$tar.find('.id').on('click', function(){
+				var id = $(this).text();
+				Member.show( {id:id} );
+			});
+
+			// 수정
+			$tar.find('button').on('click', function(){
+				datas.parent = board;
+				datas.callback = function(res, datas) {
+					if( res ) {
+						board.reload();
+						$dialog.dialog('close');
+						toastr.success('수정 성공');
+					}
+				}
+
+				var $dialog = $.loadDialog({
+					popup: 'guide/notice',
+					data:datas,
+					width:'auto',
+					height: $(window).height()*0.9
+				});
+			});
+		}
+	});
+
+	$body.find('button.del').on('click', function(){
+
+		var $list = $body.find('input[type=checkbox]:checked');
+		if( $list.length > 0 && confirm('선택된 글을 삭제하시겠습니까?') ) {
+
+			var docount = $list.length;
+			$list.each(function(i){
+
+				var $this = $(this).closest('tr');
+				var data = $this.data('data');
+
+				board.remove(data, function(res, datas){
+					if( res ) {
+						toastr.success( '삭제됨' );
+						comp.reload();
+					}
+					if( --docount == 0 )
+						comp.reload();
+				});
+
+			});
+		}
+	});
+
+	// 신규
+	$body.find('button.add').on('click', function(){
+		var data = {type:'new', parent:board};
+		var $dialog = null;
+		data.callback = function(res, datas) {
+			if( res ) {
+				$dialog.dialog('close');
+				board.reload();
+				toastr.success( '공지글 추가 성공' );
+			}
+		};
+
+		$dialog = $.loadDialog({
+			title: '신규등록',
+			popup:'guide/notice',
+			width:'auto',
+			height: $(window).height()*0.9,
+			data:data
+		});
+	});
+
+	$body.find('form').on('submit', function(){
+		board.setFilter($(this).formData());
+		board.load();
+		return false;
+	});
+	$body.find('form').trigger('submit');
+});
+
+</script>
+</head>
+<body>
+
+	<form class="search">
+		<table>
+			<tr>
+				<th>제목</th>
+				<td><input type="text" name="title"></td>
+				<th>글내용</th>
+				<td><input type="text" name="content"></td>
+				<td rowspan="2" class="btns">
+					<button type="button" class="img clear">초기화</button><br/>
+					<button type="submit" class="img search">검색하기</button>
+				</td>
+			</tr>
+
+		</table>
+
+	</form>
+
+	<div class="data_grid">
+
+		<div class="header">
+			<button type="button" class="btn add">등록하기</button>
+			<button type="button" class="btn red del">삭제하기</button>
+			<button type="button" class="btn green"><i class="fa fa-file-excel-o"></i> 엑셀 다운로드</button>
+		</div>
+
+		<div class="pageing"></div>
+		<table class="list">
+			<thead>
+				<tr>
+					<th width="30"><input name="check" type="checkbox"></th>
+					<th width="30">번호</th>
+					<th width="120">등록일</th>
+					<th width="50">등록자</th>
+					<th>제목</th>
+					<th width="30">공지여부</th>
+					<th width="30">사용여부</th>
+					<th width="40">조회수</th>
+					<th width="50"></th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div class="pageing"></div>
+	</div>
+
+<script type="text/html" class="tmpl_notice">
+<tr>
+	<td><input name="check" type="checkbox"></td>
+	<td>${boardNo}</td>
+	<td>${timeConv(regDate)}</td>
+	<td><a href="#" class="id">${id}</a></td>
+	<td class="text">${title}</td>
+	<td>${isNotice}</td>
+	<td>${isUse}</td>
+	<td>${hits}</td>
+	<td><button type="button" class="btn ssmall">수정</button></td>
+</tr>
+</script>
+
+</body>
+</html>

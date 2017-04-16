@@ -1,0 +1,817 @@
+@charset "utf-8";
+
+html { height:100% }
+
+
+body {
+	font:12px/1.5 NanumGothic,"나눔고딕","맑은 고딕", "나눔고딕",Verdana, AppleGothic, 굴림, gulim, Sans-serif;
+	padding: 0 0 0 200px;
+	margin: 0;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+	
+}
+
+a:link          { color:#000;     text-decoration:none;}
+a:visited       { color:#000;     text-decoration:none;}
+a:hover         { color:#0099cc;  text-decoration:underline;}
+a:active        { color:#666;     text-decoration:none;}
+
+pre {
+	font-size: 13px;
+	line-height: 14px;
+	background: #f1f1f1;
+	border: 1px solid #CCC;
+}
+h4 {
+	height: 25px;
+	margin: 10px 0;
+	position: relative;
+}
+h4 button.copy {
+	background: url(../images/global/btn_copy.png) no-repeat 0 50%;
+	
+	position: absolute;
+	right: 0;
+	top: -8px;
+	width: 88px;
+	height: 39px;
+	border: none;
+	text-indent: -1000em;
+}
+
+
+.body>.context p{
+	padding: 5px 10px;
+	background: #f8f8f8;
+}
+
+
+button[type='button'] {
+	position: relative;
+}
+button[type='button'].btn:ACTIVE, button[type='button'].img:ACTIVE {
+	top:1px;
+	left:1px;
+}
+
+button.img {
+	border: 0;
+	text-indent: -1000em;
+	font-size: 0;
+	vertical-align: middle;
+	background: url() no-repeat 50% 50%;
+}
+
+form {
+	margin: 0;
+	padding: 0;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+input {
+	vertical-align: middle;
+}
+input[type=text] {
+	padding: 0 5px;
+}
+input[type=text][disabled] {
+	background: #f2f2f2;
+	color:#999999;
+}
+input[type=text][readonly] {
+	background: #f2f2f2;
+}
+input[type=text], select{
+	border: 1px solid #c9cbd6;
+	font:12px/1.5 NanumGothic,"나눔고딕","맑은 고딕", "나눔고딕",Verdana, AppleGothic, 굴림, gulim, Sans-serif;
+}
+input.datepicker {
+	background-image: url(../images/global/icon_calendar.png);
+	background-repeat: no-repeat;
+	background-position: 100% 50%;
+}
+
+
+.new:AFTER {
+	content: "";
+	display: inline-block;
+	width: 9px;
+	height: 9px;
+	margin-left: 5px;
+	background: url(../images/global/icon_new.png) no-repeat 50% 50%;
+}
+.required:BEFORE{
+	content: "*";
+	margin-right: 0.2em;
+}
+.ui-dialog-buttonset{
+	text-align: center;
+	float: none !important;
+}
+
+.resizer {
+	width:5px; 
+	cursor: w-resize; 
+	height: 100%; 
+	background:#Fc0; 
+	position: absolute;
+	left:0;
+	margin-left: -2px;
+}
+
+body.menu_hide {
+	padding: 0 0 0 0;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+body.menu_hide #menu{ 
+	left:-201px;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+body.menu_hide #menu button.toggle {
+  right: -20px;
+  background: #192540;
+}
+body.menu_hide #menu button.toggle:AFTER {
+	content: "\f054";
+}
+
+/************************************************************
+						#menu
+************************************************************/
+#menu {
+	position: fixed;
+	left:0;
+	top:0;
+	background: #575d74 url(../images/global/bg_menu.png) repeat-x 0 0;
+	color: #FFF;
+	width:200px;
+	height:100%;
+	border-right: 1px solid #000;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+	z-index: 110;
+	
+}
+#menu h1{
+	margin: 0;
+	background: url(../images/global/pic_logo.png) no-repeat 20% 50%;
+	height: 85px;
+	
+	text-indent: -1000em;
+}
+#menu button.toggle {
+  position: absolute;
+  right: 10px;
+  top: 30px;
+  border: none;
+  background: transparent;
+  padding:5px;
+}
+#menu button.toggle:AFTER {
+	font:normal normal normal 14px/1 FontAwesome;
+	content: "\f053";
+	display: inline-block;
+	color: #FFF;
+}
+/************************************************************
+						#menu .profile
+************************************************************/
+#menu .profile {
+	margin: 0 15px 20px 15px;
+}
+#menu .profile p{
+	
+	color:#ffff99;
+	font-weight: bold;
+}
+#menu .profile dt {
+	width: 105px;
+	clear: left;
+	float: left;
+	margin: 2px 0;
+}
+#menu .profile dd {
+	width: 65px;
+	float: left;
+	text-align: right;
+	font-weight: bold;
+	margin: 2px 0;
+}
+
+#menu .profile dt:BEFORE {
+	 display: inline-block;
+	 font: normal normal normal 14px/1 FontAwesome;
+	 margin-right: 5px;
+	
+}
+#menu .profile dt.message:BEFORE{
+	 content: "\f0e0";
+}
+#menu .profile dt.system:BEFORE{
+	 content: "\f071";
+}
+#menu .profile:AFTER{
+	content: "";
+	display: block;
+	clear: both;
+}
+#menu .profile a {
+	color:#FFF;
+}
+
+#menu ol p{
+	margin: 0;
+	cursor: pointer;
+}
+#menu ol {
+	margin: 0;
+	padding: 0;
+}
+#menu>ol>li>p>i{
+	margin: 0 10px;
+}
+#menu>ol>li>p {
+	font-size: 16px;
+	font-weight: bold;
+	height: 35px;
+	line-height: 35px;
+	border-top:1px solid #6b7083;
+	border-bottom:1px solid #3d4151;
+}
+#menu>ol>li>p i{
+	opacity:0.7;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+}
+#menu>ol>li>ol{
+	height: 0;
+	overflow:hidden;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+#menu>ol>li.selected>p{
+	background: #474d63;
+	border-bottom: 2px solid #17b6ee;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+#menu>ol>li.selected>ol{
+	height: auto;
+	background: #3d4151;
+	padding: 5px 0;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+#menu>ol>li>ol>li>p {
+	font-size: 14px;
+	line-height: 28px;
+	font-weight: bold;
+	height: 28px;
+	background: url(../images/global/icon_menu_2depth.png) no-repeat 8px 0;
+	text-indent: 25px;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;	
+}
+#menu>ol>li>ol>li.selected>p {
+	background-position: 8px -28px;
+	background-color:#2b2d39;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+#menu>ol>li>ol>li>ol>li>p {
+	font-size: 12px;
+	height: 22px;
+	line-height: 22px;
+	background: url(../images/global/circle_white_6x6.png) no-repeat 20px 50%;
+	text-indent: 35px;	
+}
+#menu>ol>li>ol>li>ol>li.selected>p {
+	background-color: #2b2d39;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+
+#menu>ol>li>ol>li>ol>li{
+	height: 0;
+	overflow: hidden;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;	
+}
+#menu>ol>li>ol>li.selected>ol>li{
+	height: 2em;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+
+
+
+
+/************************************************************
+						.body
+************************************************************/
+/************************************************************
+						 .tabs
+************************************************************/
+.body>.tabs {
+	background: #CCC;
+	height: 32px;
+	overflow: hidden;
+}
+.body.selected>.tabs {
+	background: #18243e url(../images/global/bg_tabs.png) repeat-x 0 100%;
+}
+.body>.tabs button.more{
+	border: none;
+	background: transparent;
+	color: #FFF;
+	float: right;
+}
+.body>.tabs button.more i{
+	font-size: 20px;
+	line-height: 30px;
+	opacity:0.6;
+}
+
+.body>.tabs .tab {
+	opacity: 0.7;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	
+	float: left;
+	padding:0 10px;
+	margin-top: 2px;
+	margin-right: 1px;
+	margin-left: 1px;
+	height: 30px;
+	background: #FFF;
+	line-height: 30px;
+	color:#223256;
+	
+	border-radius: 5px 5px 0 0 ;
+}
+.body>.tabs .tab.selected{
+	font-weight: bold;
+	opacity:1;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+}
+.body>.tabs .tab .close{
+	background: url(../images/global/btn_close.png) no-repeat 50% 50%;
+	width: 12px;
+	height: 12px; 
+	margin-left: 5px;
+}
+.body>.tabs .tab.ui-sortable-helper {
+    box-shadow: 0 0 5px #000;
+}
+.body>.tabs .tab.ui-sortable-helper .close {
+	display: none;
+}
+
+/************************************************************
+						 .tabs
+************************************************************/
+
+.tabs {
+	height: 32px;
+}
+.tabs .tab {
+	opacity: 0.7;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	
+	float: left;
+	padding:0 10px;
+	margin-top: 2px;
+	margin-right: 1px;
+	margin-left: 1px;
+	height: 30px;
+	background: #FFF;
+	line-height: 30px;
+	color:#223256;
+	
+	border-radius: 5px 5px 0 0 ;
+}
+.tabs .tab.selected{
+	font-weight: bold;
+	opacity:1;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+}
+.tabs .tab .close{
+	background: url(../images/global/btn_close.png) no-repeat 50% 50%;
+	width: 12px;
+	height: 12px; 
+	margin-left: 5px;
+}
+
+/************************************************************
+						.ui-dialog .tabs
+************************************************************/
+.ui-dialog .tabs {
+	background: #dadee1;
+	border-bottom:2px solid #000;
+	margin:-0.5em -1em 0 -1em;
+	padding: 0.5em 0.2em 0 0.2em;
+}
+.ui-dialog .tabs .tab{
+	background: #f2f3f3 url(../images/global/bg_tab_disabled.png) repeat-x 0 100%;
+	border: 1px solid #bdc0c6;
+	border-bottom:1px solid #000;	
+	margin-top: 1px;
+	color:#333333;
+	opacity:1;
+}
+.ui-dialog .tabs .tab.selected{
+	border:2px solid #000;
+	background: #fcfdfd;
+	border-bottom: none; 
+	margin-top: 2px;
+}
+
+/************************************************************
+						.data_grid .tabs
+************************************************************/
+.data_grid .tabs {
+	border-bottom:2px solid #000;
+	padding: 0.5em 1em 0 1em;
+}
+.data_grid .tabs .tab{
+	background: #f2f3f3 url(../images/global/bg_tab_disabled.png) repeat-x 0 100%;
+	border: 1px solid #bdc0c6;
+	border-bottom:1px solid #000;	
+	margin-top: 1px;
+	color:#333333;
+	opacity:1;
+}
+.data_grid .tabs .tab.selected{
+	border:2px solid #000;
+	background: #fcfdfd;
+	border-bottom: none; 
+	margin-top: 2px;
+}
+
+
+
+/************************************************************
+						.body > .context
+************************************************************/
+.body {
+	position: relative;
+	height: 100%;
+
+}
+.body>.context {
+	padding: 20px 20px;
+	overflow-y: scroll;
+	height: 100%;
+}
+.body>.context h2{
+	margin-top: 0;
+	padding-bottom:10px;
+	border-bottom: 2px solid #34343e;
+	background: url(../images/global/dot_gray_3x3.png) no-repeat 5px 10px;
+	text-indent: 18px;
+	font-size: 14px;
+}
+.body>.context h2 span{
+	color:#48494f;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.body>.context .header {
+	padding: 7px 10px;
+}
+
+/************************************************************
+						form.search
+************************************************************/
+form.search {
+	border: 1px solid #a6a8b6;
+	background: #f8f8f9;
+	width: 1000px;
+}
+form.search tr th,
+form.search tr td{
+	border-top: 1px solid #dfe0e6;
+	min-height: 28px;
+	line-height: 28px;
+	padding: 0 10px;
+	vertical-align:top;
+	text-align: left;
+}
+form.search table {
+	width: 100%;
+}
+form.search td.btns {
+	border-left: 1px solid #dfe0e6;
+	vertical-align: middle;
+	text-align: center;
+}
+
+/************************************************************
+						#loadingDiv
+************************************************************/
+#loadingDiv {
+	background: rgba(0,0,0,0.3);
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 10000;
+}
+
+/************************************************************
+						button.img
+************************************************************/
+button.img.clear {
+	width: 76px;
+	height: 23px;
+	background-image: url(../images/global/btn_clear.png);
+}
+button.img.search {
+	width: 76px;
+	height: 33px;
+	background-image: url(../images/global/btn_search.png);
+}
+button.img.logout {
+	width: 48px;
+	height: 16px;
+	background-image: url(../images/global/btn_logout.png);
+}
+
+
+/************************************************************
+						form.form table
+************************************************************/
+form.form {
+	/*margin-top: 10px;*/
+}
+
+form.form table{
+	table-layout:fixed;
+    border-spacing: 0;
+    border-collapse: collapse;
+    border: 1px solid #c9cbd6;
+    margin-right: 12px;
+    margin-top: 10px;
+}
+form.form .f_left{
+	float: left;
+}
+form.form .clear_both{
+	clear: both;
+}
+
+form.form table caption{
+	text-align: left;
+	padding-left: 8px;
+	padding-bottom: 7px;
+	font-family: "맑은 고딕";
+	font-weight: bold;
+	font-color: #202844;
+}
+
+form.form thead th{
+	height: 27px;
+	line-height: 27px;
+	background: #eff1f5;
+	font-size: 12px;
+	padding: 0 8px;
+	white-space: nowrap;
+}
+form.form td ,form.form th{
+	border-bottom: 1px solid #c9cbd6;
+	font-size: 12px;
+}
+form.form th {
+	font-weight: bold;
+	text-align: left;
+	padding-left: 13px;
+	padding-right: 13px;
+	border-left: none;
+	border-right: none;
+}
+
+form.form th.use {
+	width: 72px;
+}
+form.form td {
+	background: #FFF;
+	text-align: left;
+	padding:5px;
+}
+input#sign{
+	width: 579px;
+}
+form.form tr.ord td{
+	background: #f5f5f5;
+}
+form.form td.number {
+	text-align: right;
+}
+form.form td.text {
+	text-align: left;
+}
+
+form.form div.dept{
+	float: left;
+	margin-top: 20px;
+}
+form.form div.reset{
+	margin-top: 20px;
+	margin-bottom: 50px;
+}
+form.form table tbody tr th{
+	background-color: #eff1f5;
+}
+form.form table tbody tr td input[type=text]{
+	border: 1px solid #c9cbd6;
+	margin-left: 2px;
+}
+form.form table tbody tr td textarea{
+	border: 1px solid #c9cbd6;
+	width: 95%;
+	margin-left: 2px;
+}
+
+
+
+/************************************************************
+						table.list
+************************************************************/
+
+table.list thead th{
+	height: 27px;
+	line-height: 27px;
+	color: #FFF;
+	background: url(../images/global/bg_table_th.png) no-repeat 0 0;
+	font-size: 12px;
+	padding: 0 8px;
+	white-space: nowrap;
+}
+
+table.list td , table.list th{
+	border-left: 1px solid #c5c5c5;
+	border-bottom: 1px solid #d6d6d8;
+}
+
+table.list td {
+	background: #FFF;
+	text-align: center;
+	padding:5px;
+}
+
+table.list tr.ord td{
+	background: #f5f5f5;
+}
+
+table.list td.number {
+	text-align: right;
+}
+table.list td.text {
+	text-align: left;
+}
+
+/************************************************************
+						div.data_grid
+************************************************************/
+div.data_grid {
+	margin: 7px 0;
+	border: 1px solid #767787;
+	background: #e4e4ea;
+} 
+
+div.data_grid > table.list{
+    width: 100%
+}
+
+div.data_grid .tab_body{
+	background: #fcfdfd;
+	padding: 10px 20px 30px 20px;
+}
+
+/************************************************************
+						div.mixed_form
+************************************************************/
+div.mixed_form{
+	border: 1px solid #767787;
+	background: #fcfdfd;
+	padding: 10px 20px 30px 20px;
+}
+
+
+
+/************************************************************
+					button.btn  
+				기본이 진한 남색
+************************************************************/
+button.btn[disabled] {
+	opacity:0.5;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+}
+/* IE 8 only */
+@media all\0 { 
+button.btn[disabled]:AFTER{
+	display: none;
+}
+}
+button.btn {
+	background:#33333d url(../images/global/btn_bg.png) no-repeat 0 0;
+	height: 33px;
+	color:#FFF;
+	font-size: 12px;
+	font-weight: bold;
+	border: 0;
+	padding:0 14px;
+	position: relative;
+	text-shadow: 0 0 2px #000;
+}
+button.btn:AFTER{
+	content:"";
+	display:inline-block;
+	background:#33333d url(../images/global/btn_bg.png) no-repeat 100% 0;
+	width: 5px;
+	height: 33px;
+	position: absolute;
+	right: 0;
+	top:0;
+}
+
+button.btn.red {
+	background:#0f7a0c url(../images/global/btn_red_bg.png);
+}
+button.btn.red:AFTER {
+	background:#0f7a0c url(../images/global/btn_red_bg.png) no-repeat 100% 0;
+}
+
+button.btn.green {
+	background:#0f7a0c url(../images/global/btn_green_bg.png);
+}
+button.btn.green:AFTER {
+	background:#0f7a0c url(../images/global/btn_green_bg.png) no-repeat 100% 0;
+}
+
+button.btn.gray {
+	text-shadow: 0 0 2px #666;
+	background:#0f7a0c url(../images/global/btn_gray_bg.png);
+}
+button.btn.gray:AFTER {
+	background:#0f7a0c url(../images/global/btn_gray_bg.png) no-repeat 100% 0;
+}
+
+/************************************************************
+					button.btn.small  
+				제일 작은 버튼 기본이 회색
+				버튼에 둥그런 느낌이 없다 
+************************************************************/
+
+button.btn.small {
+	height: 23px;
+	line-height: 23px;
+	background:#33333d url(../images/global/btn_small_bg.png) no-repeat 0 0;
+	margin-left: 13px;
+	font-family: "돋움체";
+}
+
+button.btn.small:AFTER {
+	background:#33333d url(../images/global/btn_small_bg.png) no-repeat 100% 0;
+	height: 23px;
+}
+
+/************************************************************
+					button.btn.ssmall  
+				제일 작은 버튼 기본이 회색
+				버튼에 둥그런 느낌이 없다 
+************************************************************/
+
+button.btn.ssmall {
+	text-shadow: none;;
+	height: 21px;
+	line-height: 21px;
+	font-size: 12px;
+	font-weight: normal;
+}
+button.btn.ssmall:AFTER {
+	height: 21px;
+}
+button.btn.ssmall.gray {
+	background:#e4e4e4 url(../images/global/btn_small_gray_bg.png) no-repeat 0 0;
+	color:#3c3c46;
+}
+button.btn.ssmall.gray:AFTER {
+	background:#e4e4e4 url(../images/global/btn_small_gray_bg.png) no-repeat 100% 0;
+	height: 21px;
+}
+
+
+
+/*! jQuery Placeholder Plugin - v0.7.0 - 2013-02-18
+* http://andrew-jones.com/jquery-placeholder-plugin
+* Copyright (c) 2013 Andrew Jones; Licensed MIT */
+
+.placeholder { color: #666; }
+.placeholderFocus { color: #000; }

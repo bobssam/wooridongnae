@@ -1,0 +1,8 @@
+{
+	"status" : "ok",
+	"total": 30,
+	"list" : [
+		{"boardNo":1, "regDate":"2015-07-09 12:12:12", "memberNo":2, "title":"제목입니다", "isNotice":"N", "hits":12, "isUse":"Y"},
+		{"boardNo":2, "regDate":"2015-07-09 12:12:12", "memberNo":1, "title":"잘 나옵니까?", "isNotice":"Y", "hits":31, "isUse":"Y"}
+	]
+}

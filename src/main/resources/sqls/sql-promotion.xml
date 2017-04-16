@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="promotion">
+    <resultMap type="com.suba.vo.PromotionVO" id="promotionVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM promotion
+    	WHERE
+    		is_use = 'Y'
+	</select>
+    <select id="list" resultMap="promotionVO">
+		SELECT
+			promotion_no,
+			file_no,
+			model,
+			title,
+			comment,
+			reg_date
+		FROM
+			promotion
+    	WHERE
+    		is_use = 'Y'
+    	ORDER BY promotion_no DESC
+   	</select>
+    <select id="view" resultMap="promotionVO">
+		SELECT
+			promotion_no,
+			file_no,
+			model,
+			title,
+			comment,
+			reg_date
+		FROM
+			promotion
+    	WHERE
+    		is_use = 'Y'
+    		AND promotion_no = #{promotionNo}
+   	</select>
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tenderLog">
+    <resultMap type="com.suba.vo.TenderLogVO" id="TenderLogVO" />
+    <select id="total" resultType="int">
+    	SELECT COUNT(*) FROM tender_log
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND member_no = #{where.memberNo}
+			</if>
+
+	</select>
+    <select id="list" resultMap="TenderLogVO">
+		SELECT
+			tender_log_no,
+			tender_no,
+			t.member_no,
+			m.id,
+			minus_point,
+			t.reg_date
+		FROM
+			tender_log t
+			JOIN member m
+			ON t.member_no = m.member_no
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND m.member_no = #{where.memberNo}
+			</if>
+
+		ORDER BY tender_log_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="insert">
+		INSERT INTO tender_log (
+			tender_log_no,
+			tender_no,
+			member_no,
+			minus_point,
+			reg_date
+		)
+		VALUES (
+			#{tenderLogNo},
+			#{tenderNo},
+			#{memberNo},
+			#{minusPoint},
+			now()
+		)
+    </insert>
+	<update id="modify">
+		UPDATE tender_log
+		SET
+			tender_no = #{tenderNo},
+			member_no = #{memberNo},
+			minus_point = #{minus_point},
+			reg_date = #{regDate}
+		WHERE
+			tender_log_no = #{tenderLogNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM tender_log
+		WHERE
+			tender_log_no = #{tenderLogNo}
+    </delete>
+</mapper>

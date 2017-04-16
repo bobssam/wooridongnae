@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="regLog">
+<resultMap type="com.suba.vo.RegLogVO" id="regLogVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM reg_log
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND member_no = #{where.memberNo}
+			</if>
+			<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND reg_date >= #{where.startRegDate}
+			</if>
+			<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND reg_date &lt;= #{where.endRegDate}
+			</if>
+
+	</select>
+    <select id="list" resultMap="regLogVO">
+		SELECT
+			seq,
+			reg_date,
+			member_no,
+			id
+		FROM
+			reg_log
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND member_no = #{where.memberNo}
+			</if>
+			<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND reg_date >= #{where.startRegDate}
+			</if>
+			<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND reg_date &lt;= #{where.endRegDate}
+			</if>
+
+		ORDER BY seq DESC
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="insert">
+		INSERT INTO reg_log (
+			reg_date,
+			member_no,
+			id
+		)
+		VALUES (
+			now(),
+			#{memberNo},
+			#{id}
+		)
+    </insert>
+    <delete id="delete">
+		DELETE FROM reg_log
+		WHERE
+			seq = #{seq}
+    </delete>
+</mapper>

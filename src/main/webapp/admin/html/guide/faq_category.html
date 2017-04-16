@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var $tbody = $body.find('table.list tbody');
+	var category = {};
+
+	function getCateName( no ) {
+		return category[no];
+	}
+	window.getCateName = getCateName;
+
+	$body.makeCheckAll();
+	$body.find('[name=boardType]').options({'':'전체', 'faq':'FAQ'});
+
+	var board = $tbody.board({
+		page: 1,
+		len: 10,
+		api: '/api/boardCategory/',
+		template: $body.find('.tmpl_qna'),
+		paging: $body.find('.pageing'),
+		onRender : function( $tar, datas ) {
+
+			// 수정
+			$tar.find('button').on('click', function(){
+				datas.parent = board;
+				datas.cate = category;
+				datas.callback = function(res, datas) {
+					if( res ) {
+						board.reload();
+						$dialog.dialog('close');
+						toastr.success('수정 성공');
+					}
+				}
+
+				var $dialog = $.loadDialog({
+					popup: 'guide/faq_category',
+					data:datas,
+					width:'auto',
+				});
+			});
+		}
+	});
+
+	$body.find('button.del').on('click', function(){
+
+		var $list = $body.find('input[type=checkbox]:checked');
+		if( $list.length > 0 && confirm('선택된 글을 삭제하시겠습니까?') ) {
+
+			var docount = $list.length;
+			$list.each(function(i){
+
+				var $this = $(this).closest('tr');
+				var data = $this.data('data');
+				debugger;
+
+				board.remove(data, function(res, datas){
+					if( res ) {
+						toastr.success( '삭제됨' );
+						board.reload();
+					}
+					if( --docount == 0 )
+						board.reload();
+				});
+
+			});
+		}
+	});
+
+	// 신규
+	$body.find('button.add').on('click', function(){
+		var data = {type:'new', parent:board, cate:category};
+		var $dialog = null;
+		data.callback = function(res, datas) {
+			if( res ) {
+				$dialog.dialog('close');
+				board.reload();
+				toastr.success( '코드 추가 성공' );
+			}
+		};
+
+		$dialog = $.loadDialog({
+			title: '신규등록',
+			popup:'guide/faq_category',
+			width:'auto',
+			data:data
+		});
+	});
+
+	$body.find('form').on('submit', function(){
+		board.setFilter($(this).formData());
+		board.load();
+		return false;
+	});
+	$body.find('form').trigger('submit');
+
+});
+
+</script>
+</head>
+<body>
+
+
+
+	<form class="search">
+		<table>
+			<tr>
+				<th>분류</th>
+				<td><select name="boardType"></select></td>
+				<th>카테고리명</th>
+				<td><input type="text" name="categoryName" size="20"></td>
+				<td rowspan="2" class="btns">
+					<button type="button" class="img clear">초기화</button><br/>
+					<button type="submit" class="img search">검색하기</button>
+				</td>
+			</tr>
+
+		</table>
+
+	</form>
+
+	<div class="data_grid">
+
+		<div class="header">
+			<button type="button" class="btn add">등록하기</button>
+			<button type="button" class="btn red del">삭제하기</button>
+			<button type="button" class="btn green"><i class="fa fa-file-excel-o"></i> 엑셀 다운로드</button>
+		</div>
+
+		<div class="pageing"></div>
+		<table class="list">
+			<thead>
+				<tr>
+					<th width="30"><input name="check" type="checkbox"></th>
+					<th width="30">분류</th>
+					<th width="120">번호</th>
+					<th>카테고리명</th>
+					<th width="50"></th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div class="pageing"></div>
+	</div>
+
+<script type="text/html" class="tmpl_qna">
+<tr>
+	<td><input name="check" type="checkbox"></td>
+	<td>${boardType}</td>
+	<td>${categoryNo}</td>
+	<td class="text">${categoryName}</td>
+	<td><button type="button" class="btn ssmall">수정</button></td>
+</tr>
+</script>
+
+</body>
+</html>

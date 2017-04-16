@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="main_banner">
+    <resultMap type="com.suba.vo.MainBannerVO" id="mainBannerVO" />
+    <select id="mainList" resultMap="mainBannerVO">
+		SELECT
+			file_no,
+			is_use,
+			title,
+			url
+		FROM
+			main_banner
+    	WHERE
+    		is_use='Y'
+		ORDER BY RAND()
+		LIMIT 5
+    </select>
+</mapper>

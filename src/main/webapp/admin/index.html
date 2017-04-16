@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>우리동네- 관리자</title>
+<link rel="stylesheet" type="text/css" href="plugin/aswesome/css/font-awesome.min.css" />
+<link rel="stylesheet" type="text/css" href="plugin/jquery-ui/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="css/global.css">
+<link rel="stylesheet" type="text/css" href="plugin/toast/toastr.css" />
+<link rel="stylesheet" type="text/css" href="plugin/fakeloader/fakeLoader.css"/>
+<link rel="stylesheet" type="text/css" href="js/jquery.contextMenu.css"  />
+<link rel="stylesheet" type="text/css" href="plugin/fileupload/css/jquery.fileupload.css"  />
+
+<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="plugin/jquery-ui/jquery-ui.js"></script>
+
+<script src="plugin/fileupload/js/jquery.fileupload.js"></script>
+
+<script type="text/javascript" src="plugin/toast/toastr.js"></script>
+<script type="text/javascript" src="plugin/fakeloader/fakeLoader.js"></script>
+<script type="text/javascript" src="js/comp.js"></script>
+<script type="text/javascript" src="js/admin.js"></script>
+<script type="text/javascript" src="js/jquery.contextMenu.js"></script>
+<script type="text/javascript" src="js/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="plugin/se/js/HuskyEZCreator.js" charset="utf-8"></script>
+
+
+<script type="text/javascript">
+$(function(){
+
+	var $context = $('body .context');
+	var $menu = $('#menu');
+	var userInfo = null;
+
+	$(window).on('resize', function(){
+		$('.body>.context').css({height:$(window).height()-32-40});
+	});
+
+	$.ajax({
+		url: apiRoot+'/api/login/info',
+		type: 'POST',
+		success: function( datas ) {
+
+			if( datas.status == "fail" ) {
+				return;
+			}
+			userInfo = datas;
+
+			$('.profile .name').text(userInfo.data.id+'님');
+			$('.profile a.message').text(userInfo.data.noteCnt+'건');
+		}
+	});
+
+	$('.profile a.message').on('click', function(){
+		var datas = {isPopup:true, memberNo:userInfo.memberNo};
+		var $dialog = $.loadDialog({
+			title : '쪽지 리스트',
+			popup: '../note/list',
+			data:datas,
+			width:'auto',
+		});
+	});
+
+
+	$(window).trigger('resize');
+	$('#menu .toggle').on('click', function(){
+
+		$('.resizer').hide();
+		$('body').toggleClass('menu_hide');
+
+	});
+
+
+
+	var clipboard = null;
+	 $.contextMenu({
+        selector: '.component',
+        callback: function(key, options) {
+
+            if( key == 'copy' ) {
+        		clipboard = options.$trigger.data('comp').get();
+            } else if( key == 'paste' ) {
+            	if( clipboard ) {
+            		options.$trigger.data('comp').set(clipboard);
+            	}
+            } else if( key == 'clear' ) {
+            	options.$trigger.data('comp').clear();
+            }
+        },
+        events : {
+        	show: function(options) {
+        		if( options.event.toElement.tagName == 'INPUT' ) return false;
+        		if( options.event.toElement.tagName == 'SELECT' ) return false;
+        		if( options.event.toElement.tagName == 'BUTTON' ) return false;
+        	}
+        },
+        items: {
+            "copy": {name: "클립보드카피", icon: "copy"},
+            "paste": {name: "불여넣기", icon: "paste"},
+            "clear": {name: "지우기", icon: "clear"},
+            "reload": {name: "relaod"},
+        }
+    });
+
+
+	 $.contextMenu({
+        selector: 'button.more',
+        trigger: 'left',
+        callback: function(key, options) {
+
+        },
+        items: {
+            "2view": {name: "2개로 보기", icon: "copy"},
+            "1view": {name: "1개로 보기", icon: "paste"},
+            "closeall": {name: "전체닫기", icon: "clear"},
+        }
+    });
+});
+</script>
+
+</head>
+<body>
+
+<div id="menu">
+
+	<h1>우리동네
+		<button type="button" class="toggle"></button>
+	</h1>
+
+
+	<div class="profile">
+
+		<p><a href="#" class="name">홍길동님</a> 안녕하세요
+			<button type="button" class="logout img">로그아웃</button>
+		</p>
+
+		<dl>
+			<dt class="message new">신규메세지</dt>
+			<dd><a href="#" class="message">0건</a></dd>
+			<dt class="system new">시스템 알림</dt>
+			<dd><a href="#">0건</a></dd>
+		</dl>
+
+	</div>
+
+	<ol>
+		<li class="code selected">
+			<p><i class="fa fa-qrcode"></i> 코드 관리</p>
+			<ol>
+				<li class="category"><p>-카테고리 관리</p></li>
+				<li class="area"><p>-지역 구분</p></li>
+			</ol>
+
+		</li>
+		<li class="user">
+			<p><i class="fa fa-users"></i>회원 관리</p>
+			<ol>
+				<li class="list"><p>-일반 회원 리스트</p></li>
+				<li class="dealer"><p>딜러 회원 리스트</p></li>
+				<li class="crop"><p>협력 회원 리스트</p></li>
+				<li class="push"><p>푸시보내기</p></li>
+				<li class="memo"><p>전체 쪽지보내기</p></li>
+			</ol>
+		</li>
+		<li class="guide">
+			<p><i class="fa fa-list-alt"></i>이용안내 관리</p>
+			<ol>
+				<li class="notice"><p>-공지 사항</p></li>
+				<li class="qna"><p>-QNA</p></li>
+				<li class="faq_category"><p>-FAQ 카테고리</p></li>
+				<li class="faq"><p>-FAQ</p></li>
+			</ol>
+		</li>
+		<li class="board">
+			<p><i class="fa fa-list-alt"></i>게시판 관리</p>
+			<ol>
+				<li class="board?category=1"><p>유머게시판</p></li>
+				<li class="board?category=2"><p>신차소식</p></li>
+				<li class="board?category=3"><p>차량구입노하우</p></li>
+				<li class="board?category=4"><p>출고체크리스트</p></li>
+				<li class="board?category=5"><p>자동차정비상식</p></li>
+				<li class="board?category=6"><p>차량시승기</p></li>
+			</ol>
+		</li>
+		<li class="payment">
+			<p><i class="fa fa-credit-card"></i>결제 관리</p>
+			<ol>
+				<li class="list"><p>-결제 리스트</p></li>
+			</ol>
+		</li>
+		<li class="tender">
+			<p><i class="fa fa-smile-o"></i>입찰 관리</p>
+			<ol>
+				<li class="list"><p>-입찰리스트</p></li>
+				<li class="log"><p>-입찰로그보기</p></li>
+			</ol>
+		</li>
+		<li class="hotdeal">
+			<p><i class="fa fa-exclamation-circle"></i>핫딜&프로모션</p>
+			<ol>
+				<li class="list"><p>핫딜 리스트</p></li>
+				<li class="ask"><p>핫딜 문의 보기</p></li>
+				<li class="plist"><p>프로모션 리스트</p></li>
+			</ol>
+		</li>
+		<li class="etc">
+			<p><i class="fa fa-wrench"></i>기타/관리</p>
+			<ol>
+				<li class="mainbanner"><p>메인배너</p></li>
+				<li class="partnerask"><p>파트너문의</p></li>
+				<li class="stats"><p>통계</p></li>
+				<li class="login_log"><p>-로그인 이력보기</p></li>
+				<li class="reg_log"><p>가입 이력보기</p></li>
+			</ol>
+		</li>
+	</ol>
+
+</div>
+
+
+<div class="body" style="width: 100%; float:left">
+
+	<div class="tabs">
+		<div class="tab selected">
+			<a href="#welcome">환영합니다</a>
+		</div>
+
+		<button class="more"><i class="fa fa-chevron-circle-left"></i></button>
+	</div>
+	<div class="context">
+
+		<div class="tab_body" id="welcome">
+			<h2>웰컴!</h2>
+			<p>
+				111
+			</p>
+		</div>
+
+	</div>
+</div>
+
+<div id="loadingDiv">
+</div>
+
+<textarea id="clipboard" style="display: none"></textarea>
+
+
+<script type="text/html" id="tmpl_tab">
+<div class="tab">
+	<a href="#${id}">${name}</a> <button type="button" class="close img">close</button>
+</div>
+</script>
+<script type="text/html" id="empty_tmpl">
+<tr>
+	<td colspan="20" class="text_center">등록된 글이 없습니다.</td>
+</tr>
+</script>
+</body>
+</html>

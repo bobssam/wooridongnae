@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="false" />														<!-- 설정에서 각 mapper 에 설정된 캐시를 전역적으로 사용할지 말지에 대한 여부 -->
+		<setting name="useGeneratedKeys" value="true" />												<!-- 생성키에 대한 JDBC 지원을 허용. 지원하는  드라이버가 필요하다. true 로 설정하면 생성키를  강제로 생성한다.-->
+		<setting name="mapUnderscoreToCamelCase" value="true"/>									<!-- 데이터베이스 (Database)의 테이블 (Table) 내 컬럼 (Column)은 _ (Underscore)로 단어를 구분하고 객체 (Object)의 필드 (Field)는 CamelCase를 사용한다.-->
+        <setting name="lazyLoadingEnabled" value="true" />												<!-- 늦은 로딩을 사용할지에 대한 여부. 사용하지 않는다면 모두 즉시 로딩할 것이다. -->
+        <setting name="aggressiveLazyLoading" value="true" />											<!-- 이 옵션을 활성화 상태로 두면 늦은 로딩을 하는 객체는 호출에 따라 점진적으로 로드될 것이다. 반면 늦은 로딩을 하지 않는 객체는 요청할 때 한 번에 모두 로드된다. 디폴트는 true다. -->
+        <setting name="multipleResultSetsEnabled" value="true" />										<!-- 한개의 구문에서 여러개의 ResultSet 을 허용할지의 여부 (드라이버가 해당 기능을 지원해야 함) -->
+        <setting name="useColumnLabel" value="true" />													<!-- 칼럼명 대신에 칼럼라벨을 사용. 드라이버마다 조금  다르게 작동한다. 문서와 간단한 테스트를 통해 실제 기대하는 것처럼 작동하는지 확인해야 한다. -->
+        <setting name="autoMappingBehavior" value="FULL" />											<!-- MyBatis 가 칼럼을 필드/프로퍼티에 자동으로  매핑할지와 방법에 대해 명시. PARTIAL은 간단한  내포된 결과에 대해서는 처리하지 않는다. FULL 은 처리가능한 모든 자동매핑을 처리한다. -->
+        <setting name="defaultExecutorType" value="REUSE" />											<!-- 디폴트 실행자(executor) 설정. SIMPLE 실행자는 특별히 하는 것이 없다. REUSE 실행자는 PreparedStatement 를 재사용한다. BATCH 실행자는 구문을 재사용하고 수정을 배치처리한다.-->
+        <setting name="defaultStatementTimeout" value="25000" />									<!-- 데이터베이스로의 응답을 얼마나 오래 기다릴지를  판단하는 타임아웃을 셋팅  -->
+        <setting name="safeRowBoundsEnabled" value="false" />										<!-- 중첩구문내 RowBound 사용을 허용 -->
+        <setting name="localCacheScope" value="SESSION" />											<!-- 캐시의 저장범위를 정한다. sqlSession 객체를 기준으로 캐시할때는 SESSION, 구문별로 캐시할때는  STATEMENT 를 선택하면 된다. 디폴트는 SESSION 이다.-->
+        <setting name="jdbcTypeForNull" value="OTHER" />												<!-- 파라미터로 JDBC 타입이 기술되지 않았을 때 JDBC 타입을 null로 할지 기술, 일부 드라이버는 칼럼 JDBC 타입을 기술해야 하지만, 일부 드라이버는 NULL, VARCHAR 혹은 OTHER 같은 일반적인 값으로도 동작한다. -->
+        <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" />	<!-- 어떤 오브젝트 메소드 트리거가  늦은 로딩으로 처리할지 기술-->
+	</settings>
+	<typeAliases>
+		<typeAlias alias="BoardVO"				type="com.suba.vo.BoardVO"/>
+		<typeAlias alias="BigAreaVO"			type="com.suba.vo.BigAreaVO"/>
+		<typeAlias alias="BoardCategoryVO"		type="com.suba.vo.BoardCategoryVO"/>
+		<typeAlias alias="BoardVO"				type="com.suba.vo.BoardVO"/>
+		<typeAlias alias="CategoryVO"			type="com.suba.vo.CategoryVO"/>
+		<typeAlias alias="FileVO"				type="com.suba.vo.FileVO"/>
+		<typeAlias alias="LoginHistoryVO"		type="com.suba.vo.LoginHistoryVO"/>
+		<typeAlias alias="MemberVO"				type="com.suba.vo.MemberVO"/>
+		<typeAlias alias="NoteVO"				type="com.suba.vo.NoteVO"/>
+		<typeAlias alias="PaymentVO"			type="com.suba.vo.PaymentVO"/>
+		<typeAlias alias="SmallAreaVO"			type="com.suba.vo.SmallAreaVO"/>
+		<typeAlias alias="StaticsVO"			type="com.suba.vo.StaticsVO"/>
+		<typeAlias alias="TenderLogVO"			type="com.suba.vo.TenderLogVO"/>
+		<typeAlias alias="TenderReplyVO"		type="com.suba.vo.TenderReplyVO"/>
+		<typeAlias alias="TenderVO"				type="com.suba.vo.TenderVO"/>
+	</typeAliases>
+</configuration>

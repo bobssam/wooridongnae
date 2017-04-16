@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="loginHistory">
+    <resultMap type="com.suba.vo.LoginHistoryVO" id="LoginHistoryVO"/>
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM login_history
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND member_no = #{where.memberNo}
+			</if>
+			<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND login_date >= #{where.startRegDate}
+			</if>
+			<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND login_date &lt;= #{where.endRegDate}
+			</if>
+
+	</select>
+    <select id="list" resultMap="LoginHistoryVO">
+		SELECT
+			seq,
+			l.login_date,
+			ip,
+			l.member_no,
+			m.id
+		FROM
+			login_history l
+			JOIN member m
+			ON l.member_no = m.member_no
+		WHERE
+			1=1
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND l.member_no = #{where.memberNo}
+			</if>
+			<if test="where.startRegDate != null and where.startRegDate != ''">
+			AND l.login_date >= #{where.startRegDate}
+			</if>
+			<if test="where.endRegDate != null and where.endRegDate != ''">
+			AND l.login_date &lt;= #{where.endRegDate}
+			</if>
+
+		ORDER BY seq DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="insert">
+		INSERT INTO login_history (
+			login_date,
+			member_no,
+			ip
+		)
+		VALUES (
+			now(),
+			#{memberNo},
+			#{ip}
+		)
+    </insert>
+	<update id="modify">
+		UPDATE login_history
+		SET
+			login_date = now(),
+			member_no = #{memberNo},
+			ip = #{ip}
+		WHERE
+			seq = #{seq}
+    </update>
+    <delete id="delete">
+		DELETE FROM login_history
+		WHERE
+			seq = #{seq}
+    </delete>
+</mapper>

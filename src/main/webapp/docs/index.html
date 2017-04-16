@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SPC 차세대 플랫폼</title>
+<link rel="stylesheet" type="text/css" href="plugin/aswesome/css/font-awesome.min.css" />
+<link rel="stylesheet" type="text/css" href="plugin/jquery-ui/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="css/global.css">
+<link rel="stylesheet" type="text/css" href="plugin/toast/toastr.css" />
+<link rel="stylesheet" type="text/css" href="plugin/fakeloader/fakeLoader.css"/>
+<link rel="stylesheet" type="text/css" href="js/jquery.contextMenu.css"  />
+
+<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="plugin/jquery-ui/jquery-ui.js"></script>
+<script type="text/javascript" src="plugin/toast/toastr.js"></script>
+<script type="text/javascript" src="plugin/fakeloader/fakeLoader.js"></script>
+<script type="text/javascript" src="plugin/ace/src-min-noconflict/ace.js"></script>
+<script type="text/javascript" src="js/admin.js"></script>
+<script type="text/javascript" src="js/jquery.contextMenu.js"></script>
+<script type="text/javascript" src="js/ZeroClipboard.min.js"></script>
+
+
+<script type="text/javascript">
+$(function(){
+	
+	var $context = $('body .context');
+	var $menu = $('#menu');
+	var number = 0;
+	
+	$('.body').on('click', function(){
+		$('.body').removeClass('selected');
+		$(this).addClass('selected');
+		number = $('.body').index($(this));
+	});
+	
+	$(window).on('resize', function(){
+		$('.body>.context').css({height:$(window).height()-32-40});
+		$('.resizer').css({left:$('.body').eq(1).position().left});		
+	});
+	
+	$menu.find('li p').on('click', function(){
+		
+		
+		$(this).parent().toggleClass('selected');
+		var className = $(this).parent().attr('class');
+		
+		var paths = [stripSelected(className)];
+		var $ptar = $(this).parent().parent();
+		// 최대 부모수는 2개
+		for( var i=0;i<2;i++ ){
+			var $ptar = $ptar.closest('li');
+			if( $ptar.length > 0 ) {
+				var className = $ptar.attr('class');
+				paths.push( stripSelected(className) );
+				$ptar = $ptar.parent();
+			} else {
+				break;
+			}
+		}
+		if( $(this).parent().find('li p').length > 0 ) return;
+		loadPage( number, $(this).text(), paths.reverse().join('.') );
+
+	});
+	
+	function stripSelected( className ){
+		return $.trim(className.replace('selected', ''));
+	}
+		
+	
+	var startX = 0;
+	var width = 0;
+	var menuW = 0;
+	
+	$('.resizer').draggable({ 
+		axis: "x", 
+		start: function(event) {
+			if( $('body').hasClass('menu_hide') ) {
+				menuW = 0;
+			} else {
+				menuW = $('#menu').outerWidth();
+			}
+			width = $(window).width() - menuW;
+			startX = event.clientX;
+        },
+        drag: function(event) {
+        	$('.body').eq(0).width( ((event.clientX-menuW)/width*100)+'%' );
+        	$('.body').eq(1).width( (100-(event.clientX-menuW)/width*100)+'%' );
+        },
+        stop: function(event) {
+        	localStorage.setItem('__api__resizer__', ((event.clientX-menuW)/width*100));
+        	$('.body').eq(0).width( ((event.clientX-menuW)/width*100)+'%' );
+        	$('.body').eq(1).width( (100-(event.clientX-menuW)/width*100)+'%' );
+        }
+	});
+	var resizerSize = localStorage.getItem('__api__resizer__');
+	if( resizerSize ) {
+		$('.body').eq(0).width( resizerSize+'%' );
+    	$('.body').eq(1).width( (100-resizerSize)+'%' );
+	} 
+	$('.resizer').css({left:$('.body').eq(1).position().left})
+
+	
+	$(window).trigger('resize');
+	$('#menu .toggle').on('click', function(){
+		
+		$('.resizer').hide();
+		$('body').toggleClass('menu_hide');
+		setTimeout(function(){
+			$('.resizer').show();
+			$('.resizer').css({left:$('.body').eq(1).position().left});
+		}, 300);
+		
+		
+	});
+
+	
+	
+	var clipboard = null;
+	 $.contextMenu({
+        selector: '.component', 
+        callback: function(key, options) {
+            
+            if( key == 'copy' ) {
+        		clipboard = options.$trigger.data('comp').get();
+            } else if( key == 'paste' ) {
+            	if( clipboard ) {
+            		options.$trigger.data('comp').set(clipboard);
+            	}
+            } else if( key == 'clear' ) {
+            	options.$trigger.data('comp').clear();
+            }
+        },
+        events : {
+        	show: function(options) {
+        		if( options.event.toElement.tagName == 'INPUT' ) return false;
+        		if( options.event.toElement.tagName == 'SELECT' ) return false;
+        		if( options.event.toElement.tagName == 'BUTTON' ) return false;
+        		//$('#clipboard').val( JSON.stringify(key.$trigger.data('comp').get()) );
+        	}
+        },
+        items: {
+            "copy": {name: "클립보드카피", icon: "copy"},
+            "paste": {name: "불여넣기", icon: "paste"},
+            "clear": {name: "지우기", icon: "clear"},
+            "reload": {name: "relaod"},
+        }
+    });
+
+
+	 $.contextMenu({
+        selector: 'button.more',
+        trigger: 'left',
+        callback: function(key, options) {
+            
+        },
+        items: {
+            "2view": {name: "2개로 보기", icon: "copy"},
+            "1view": {name: "1개로 보기", icon: "paste"},
+            "closeall": {name: "전체닫기", icon: "clear"},
+        }
+    });
+	 
+	 
+
+	 /*
+	var client = new ZeroClipboard( $('.context-menu-item.icon.icon-copy')[0] );
+	$('.context-menu-item.icon.icon-copy').attr('data-clipboard-target', 'clipboard')
+
+	client.on( "ready", function( readyEvent ) {
+	  // alert( "ZeroClipboard SWF is ready!" );
+
+	  client.on( "aftercopy", function( event ) {
+		  
+	    // `this` === `client`
+	    // `event.target` === the element that was clicked
+	    //event.target.style.display = "none";
+	    //alert("Copied text to clipboard: " + event.data["text/plain"] );
+	  });
+	});
+	*/
+	
+})
+</script>
+
+</head>
+<body>
+
+<div id="menu">
+
+	<h1>SPC 차세대 플랫폼 API
+		<button type="button" class="toggle"></button>
+	</h1>
+	
+	
+	<ol>
+		<li class="basic selected">
+			<p><i class="fa fa-camera"></i>기본 API</p>
+			<ol>
+				<li class="protocol"><p>프로토콜</p></li>
+				<li class="list"><p>리스트</p></li>
+				<li class="view"><p>상세</p></li>
+				<li class="add"><p>추가</p></li>
+				<li class="delete"><p>삭제</p></li>
+				<li class="modify"><p>수정</p></li>
+			</ol>
+			
+		</li>
+		<li>
+			<p><i class="fa fa-pie-chart"></i>상위 메뉴</p>
+			<ol>
+				<li><p>2차메뉴</p>
+					<ol>
+						<li class="selected"><p>3차메뉴</p></li>
+						<li><p>3차메뉴</p></li>
+					</ol>
+				
+				</li>
+			</ol>
+		</li>
+		<li>
+			<p><i class="fa fa-tachometer"></i>상위 메뉴</p>
+			<ol>
+				<li><p>2차메뉴</p>
+					<ol>
+						<li class="selected"><p>3차메뉴</p></li>
+						<li><p>3차메뉴</p></li>
+					</ol>
+				
+				</li>
+			</ol>
+		</li>
+	</ol>
+
+</div>
+
+
+<div class="body" style="width: 70%; float:left">
+	
+	<div class="tabs">
+		<div class="tab selected">
+			<a href="#welcome">환영합니다</a> 
+		</div>
+		
+		<button class="more"><i class="fa fa-chevron-circle-left"></i></button>
+	</div>
+	<div class="context">
+	
+		<div class="tab_body" id="welcome">
+			<h2>웰컴!</h2>
+			<p>
+				론!
+			</p>
+		</div>
+	
+	</div>
+</div>
+
+<div class="body" style="width: 30%; float:left">
+	
+	<div class="tabs">
+	</div>
+	<div class="context">
+	</div>	
+</div>
+	<div class="resizer"><br/></div>
+
+
+
+
+<div id="loadingDiv">
+</div>
+
+<div id="dialog"></div>
+
+<script type="text/html" id="tmpl_tab">
+<div class="tab">
+	<a href="#${id}">${name}</a> <button type="button" class="close img">close</button>
+</div>
+</script>
+</body>
+</html>

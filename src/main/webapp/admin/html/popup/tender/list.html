@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var data = obj.data;
+
+	$body.formData(obj.data);
+	$body.find('.pointSend').on('click', function(){
+
+		var data = {memberNo:obj.data.memberNo};
+		var $dialog = null;
+		data.callback = function(res, datas) {
+			if( res ) {
+				$dialog.dialog('close');
+				board.reload();
+				toastr.success( '코드 추가 성공' );
+			}
+		};
+
+		$dialog = $.loadDialog({
+			title: '쪽지보내기',
+			popup:'note/note',
+			width:'auto',
+			data:data
+		});
+
+	});
+
+	// 신규
+	if( obj.data.type == 'new' ) {
+		$body.find('.confirm').text('작성');
+		$body.find('.onlyModify').remove();
+	} else {
+		$body.find('input[name=regDate]').disabled();
+	}
+
+	$body.find('form').on('submit', function(){
+
+		var datas = $body.formData();
+		if( obj.data.type == 'new' )
+			obj.data.parent.add( datas, obj.data.callback );
+		else
+			obj.data.parent.modify( {tenderNo:datas.tenderNo}, datas, obj.data.callback );
+		return false;
+
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+
+	$body.find('.reply_list a').on('click', function(){
+		var datas = {};
+		var $dialog = $.loadDialog({
+			title: '유저상세 정보',
+			popup: 'user/list',
+			data:datas,
+			width:'auto',
+		});
+	});
+
+
+
+
+	var $tbody = $body.find('.reply_list tbody');
+	var board = $tbody.board({
+		page: 1,
+		len: 10,
+		api: '/api/tenderReply/',
+		template: $body.find('.tmpl_log'),
+		paging: $body.find('.pageing'),
+		onRender : function( $tar, datas ) {
+		}
+	});
+
+	board.setFilter({tenderNo:data.tenderNo});
+	board.load();
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<table>
+	<caption>데이터 수정</caption>
+	<tr class="onlyModify">
+		<th>번호</th>
+		<td><input name="tenderNo" type="text" readonly="readonly"></td>
+		<th>등록일</th>
+		<td><input name="regDate" type="text" disabled="disabled"></td>
+	</tr>
+	<tr class="onlyModify">
+		<th>댓글수</th>
+		<td><input name="replyCount" type="text" disabled="disabled"></td>
+		<th>상태</th>
+		<td><input name="status" type="text" disabled="disabled"></td>
+	</tr>
+	<tr>
+		<th>지역구분</th>
+		<td><input name="bigAreaNo" type="text" disabled="disabled"></td>
+		<th>구분</th>
+		<td><input name="categoryNo" type="text" disabled="disabled"></td>
+	</tr>
+	<tr>
+		<th>제목</th>
+		<td colspan="3"><input type="text" name="title" size="30"></td>
+	</tr>
+	<tr>
+		<th>요규조건</th>
+		<td colspan="3">
+			<textarea name="content" rows="6" cols="50"></textarea>
+		</td>
+	</tr>
+	<tr>
+		<th>댓글</th>
+		<td colspan="3" height="300">
+
+			<table width="500" class="reply_list">
+			<tbody></tbody>
+			</table>
+
+		</td>
+	</tr>
+	</table>
+	<div class="btns">
+
+		<button type="submit" class="btn confirm">수정</button>
+		<button type="button" class="btn gray cancel">취소</button>
+
+	</div>
+</form>
+</div>
+
+
+<script type="text/html" class="tmpl_log">
+<tr>
+	<td width="30">${tenderLogNo}</td>
+	<td width="70"><a href="#">${id}</a></td>
+	<td>${contents}</td>
+	<td width="150">${timeConv(regDate)}</td>
+</tr>
+</script>
+
+
+</body>
+</html>

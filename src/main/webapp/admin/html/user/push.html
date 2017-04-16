@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+
+	$('.btn').on('click', function() {
+		var title = $('input[name="title"]').val();
+		var message = $('textarea[name="message"]').val();
+		if (message == "") {
+			alert("메세지가 없습니다.");
+			return;
+		}
+		$.ajax({
+	        type:"POST",
+	        url:"api/user/sendPush",
+	        data:{title:title, msg:message},
+	        success:function(data){
+	        	if(data.status=="ok") {
+	        		alert('전송성공\n'+data.reason);
+	        	} else {
+					alert('전송실패\n'+data.reason);
+	        	}
+	        },
+	        error:function(e){
+	            alert(e.responseText);
+	        }
+	    });
+
+	});
+
+});
+
+</script>
+</head>
+<body>
+	<h2>푸시보내기</h2>
+
+	<form class="form">
+		<table>
+			<tr>
+				<th>제목</th>
+				<td><input type="text" name="title" /></td>
+			</tr>
+			<tr>
+				<th>푸시 메세지</th>
+				<td><textarea name="message" cols="20" rows="10"></textarea></td>
+			</tr>
+
+		</table>
+		<p>
+			푸시 메세지는 어플이 설치된 유저에게만 갑니다.<br/>
+			메세지는 몇자로 제한하니다.
+		</p>
+		<div class="btns" style="width: 300px;">
+			<button type="button" class="btn">보내기</button>
+		</div>
+
+	</form>
+
+
+</body>
+</html>

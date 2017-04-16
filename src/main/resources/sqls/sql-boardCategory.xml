@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="boardCategory">
+    <resultMap type="com.suba.vo.BoardCategoryVO" id="BoardCategoryVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM board_category
+    	WHERE 1=1
+    		<if test="where.categoryName != null and where.categoryName != ''">
+    			AND category_name like '%${where.categoryName}%'
+    		</if>
+
+	</select>
+    <select id="list" resultMap="BoardCategoryVO">
+		SELECT
+			board_type,
+			category_no,
+			category_name,
+			category_type
+		FROM
+			board_category
+    	WHERE 1=1
+    		<if test="where.categoryName != null and where.categoryName != ''">
+    			AND category_name like '%${where.categoryName}%'
+    		</if>
+		ORDER BY category_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="insert">
+		INSERT INTO board_category(
+			board_type,
+			category_no,
+			category_name,
+			category_type
+		)
+		SELECT #{boardType}, MAX(category_no)+1, #{categoryName}, #{categoryType}
+		FROM  board_category
+		WHERE
+			board_type = #{boardType}
+    </insert>
+	<update id="modify">
+		UPDATE board_category
+		SET
+			category_name = #{categoryName},
+			category_type = #{categoryType}
+
+		WHERE
+			board_type = #{where.boardType}
+		AND category_no = #{where.categoryNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM board_category
+		WHERE
+			board_type = #{where.boardType}
+		AND category_no = #{where.categoryNo}
+    </delete>
+</mapper>

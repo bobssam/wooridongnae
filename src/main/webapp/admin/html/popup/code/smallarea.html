@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+	
+	var $body = obj.$body;
+	
+	// 신규
+	if( obj.data.type == 'new' ) {
+		$body.find('.confirm').text('작성');
+		$body.find('.onlyModify').remove();
+	} else {
+		$body.find('input[name=regDate]').disabled();
+	}
+	
+	$body.formData(obj.data);
+	$body.find('form').on('submit', function(){
+		
+		var datas = $body.formData();
+		if( obj.data.type == 'new' )
+			obj.data.parent.add( datas, obj.data.callback );
+		else
+			obj.data.parent.modify( {bigAreaNo:datas.bigAreaNo, smallAreaNo:datas.smallAreaNo}, datas, obj.data.callback );
+		return false;
+		
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+	
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<table>
+	<caption>데이터 수정</caption>
+	<tr>
+		<th>상위 번호</th>
+		<td><input name="bigAreaNo" type="text" readonly="readonly"></td>
+	</tr>
+	<tr class="onlyModify">
+		<th>번호</th>
+		<td><input name="smallAreaNo" type="text" readonly="readonly"></td>
+	</tr>
+	<tr>
+		<th>지역명</th>
+		<td colspan="3"><input name="smallAreaName" type="text" size="50"></td>
+	</tr>
+	</table>
+	<div class="btns">
+	
+		<button type="submit" class="btn confirm">수정</button>
+		<button type="button" class="btn gray cancel">취소</button>
+	
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

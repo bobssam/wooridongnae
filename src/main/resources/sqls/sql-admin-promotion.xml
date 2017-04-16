@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin_promotion">
+    <resultMap type="com.suba.vo.PromotionVO" id="promotionVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM promotion
+    	WHERE
+    		1=1
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND h.member_no = #{where.memberNo}
+		</if>
+
+	</select>
+
+    <select id="view" resultMap="promotionVO">
+		SELECT
+			h.promotion_no,
+			h.file_no,
+			h.model,
+			h.title,
+			h.reg_date,
+			h.is_use,
+			h.comment
+		FROM
+			promotion h
+    	WHERE
+    		h.promotion_no = #{where.promotionNo}
+    </select>
+    <select id="list" resultMap="promotionVO">
+		SELECT
+			h.promotion_no,
+			h.file_no,
+			h.model,
+			h.title,
+			h.reg_date,
+			h.is_use
+		FROM
+			promotion h
+    	WHERE
+    		1=1
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		ORDER BY promotion_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="add">
+		INSERT INTO promotion(
+			promotion_no,
+			file_no,
+			model,
+			title,
+			comment,
+			reg_date,
+			is_use
+		)
+		VALUES (
+			#{promotionNo},
+			#{fileNo},
+			#{model},
+			#{title},
+			#{comment},
+			NOW(),
+			#{isUse}
+		)
+    </insert>
+	<update id="modify">
+		UPDATE promotion
+		SET
+			title = #{title},
+			model = #{model},
+			file_no = #{fileNo},
+			comment = #{comment},
+			is_use = #{isUse}
+
+		WHERE
+			promotion_no = #{where.promotionNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM promotion
+		WHERE
+			promotion_no = #{where.promotionNo}
+    </delete>
+</mapper>

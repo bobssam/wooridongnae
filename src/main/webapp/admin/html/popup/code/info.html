@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+	
+	var $body = obj.$body;
+	var url = '/api/codeinfo/modify';
+	
+	$body.find('select[name=useYn]').options({'Y':'사용','N':'미사용'});
+	$body.find('select[name=codeCategorySeq]').options(obj.data.cates);
+	$body.formData(obj.data);
+	
+	// 신규
+	if( obj.data.type == 'new' ) {
+		$body.find('input[name=codeSeq]').disabled();
+	}
+	
+	$body.find('form').on('submit', function(){
+		
+		var datas = $body.formData();
+		if( obj.data.type == 'new' )
+			obj.data.parent.add( datas, obj.data.callback );
+		else
+			obj.data.parent.modify( datas, obj.data.callback );
+		return false;
+		
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+	
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<table>
+	<caption>데이터 수정</caption>
+	<tr>
+		<th>번호</th>
+		<td><input name="codeSeq" type="text" readonly="readonly"></td>
+	</tr>
+	<tr>
+		<th>카테고리</th>
+		<td><select name="codeCategorySeq"></select></td>
+	</tr>
+	<tr>
+		<th>코드값</th>
+		<td><input name="codeValue" type="text" maxlength="4" size="4"></td>
+	</tr>
+	<tr>
+		<th>코드이름</th>
+		<td><input name="codeNm" type="text"></td>
+	</tr>
+	<tr>
+		<th>코드설명</th>
+		<td><textarea name="codeInfo"></textarea></td>
+	</tr>
+	<tr>
+		<th>사용여부</th>
+		<td>
+			<select name="useYn">
+			</select>
+		</td>
+	</tr>
+	</table>
+	<div class="btns">
+	
+		<button type="submit" class="btn confirm">수정</button>
+		<button type="button" class="btn gray cancel">취소</button>
+	
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

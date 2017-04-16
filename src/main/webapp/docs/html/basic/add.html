@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+<h2>공통 <span>추가</span></h2>
+<address>[apiName]<b>/add</b></address>
+
+	<h3>추가</h3>
+	<p>
+		기능에 글이나 데이터를 추가할때 사용합니다.	
+	</p>
+
+
+	
+	<h4>요청</h4>
+	<pre>{
+	"data": {
+		// 데이터 내용
+	}
+}</pre>
+	<p>
+		<b>data</b> 데이터의 규격은 API마다 다릅니다.<br/>
+	</p>
+
+
+	<h4>정상응답</h4>
+	<pre>{
+	"status" : "ok"
+}</pre>
+
+
+
+	<h4>에러응답 - 실패</h4>
+	<pre>
+{
+	"status": "fail",
+	"reason":"[상황에 맞는 안내]"
+}</pre>
+
+
+</body>
+</html>

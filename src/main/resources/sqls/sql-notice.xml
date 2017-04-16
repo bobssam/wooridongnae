@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="notice">
+    <resultMap type="com.suba.vo.BoardVO" id="boardVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM notice
+    	WHERE
+    		is_use = 'Y'
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		<if test='where.content != null and where.content != ""' >
+			AND content like '%${where.content}%'
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND q.member_no = #{where.memberNo}
+		</if>
+
+	</select>
+    <select id="list" resultMap="boardVO">
+		SELECT
+			board_no,
+			n.reg_date,
+			n.member_no,
+			m.id,
+			title,
+			content,
+			is_notice,
+			hits,
+			category,
+			is_use
+		FROM
+			notice n
+			JOIN member m
+			ON n.member_no = m.member_no
+    	WHERE
+    		is_use = 'Y'
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		<if test='where.content != null and where.content != ""' >
+			AND content like '%${where.content}%'
+		</if>
+		<if test='where.isAnswer == "Y"' >
+			AND answer is not null
+		</if>
+		<if test='where.isAnswer == "N"' >
+			AND answer is null
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND q.member_no = #{where.memberNo}
+		</if>
+		ORDER BY is_notice DESC, board_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="boardVO">
+		SELECT
+			board_no,
+			n.reg_date,
+			n.member_no,
+			m.id,
+			title,
+			content,
+			answer,
+			is_notice,
+			hits,
+			category,
+			is_use
+		FROM
+			notice n
+			JOIN member m
+			ON n.member_no = m.member_no
+    	WHERE
+			n.board_no = #{boardNo}
+   	</select>
+    <select id="listMain" resultMap="boardVO">
+    	SELECT
+			board_no,
+			n.reg_date,
+			n.member_no,
+			title,
+			content,
+			answer,
+			is_notice,
+			hits,
+			category,
+			is_use
+		FROM
+			notice n
+		WHERE is_notice = 'Y'
+    	ORDER BY is_notice DESC, board_no DESC
+    	LIMIT 4
+    </select>
+    <update id="plusHit">
+		UPDATE notice
+		SET
+			hits = hits+1
+		WHERE
+			board_no = #{boardNo}
+    </update>
+</mapper>

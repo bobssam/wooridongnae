@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<div class="tabs">
+		<div class="tab selected">상품/발급정보</div>
+		<div class="tab">MMS발송상세/이미지 정보</div>
+	</div>
+
+	
+	<form class="form">
+	
+		<table style="float: left">
+		<caption>기본정보</caption>
+		<tbody>
+			<tr>
+				<th class="required">판매처</th>
+				<td><input type="text" readonly="readonly" value="호이호이 월드" size="25"></td>
+				<th class="use">사용 구분</th>
+				<td><label><input type="checkbox" size="15">테스트 사용</label></td>
+			</tr>
+			<tr>
+				<th>발급요청서명</th>
+				<td colspan="3"><input type="text"></td>
+			</tr>
+			<tr>
+				<th>메 모</th>
+				<td colspan="3"><textarea rows="8"></textarea></td>
+			</tr>
+		</tbody>
+		</table>
+		
+		<table style="float: left">
+		<caption>기본정보</caption>
+		<tbody>
+			<tr>
+				<th class="required">판매처</th>
+				<td><input type="text"  size="25" disabled="disabled" value="호이호이 월드"></td>
+				<th>사용 구분</th>
+				<td><label><input type="checkbox">테스트 사용</label></td>
+			</tr>
+			<tr>
+				<th>발급요청서명</th>
+				<td colspan="3"><input type="text" size="15"></td>
+			</tr>
+			<tr>
+				<th>메 모</th>
+				<td colspan="3"><textarea rows="8"></textarea></td>
+			</tr>
+		</tbody>
+		</table>
+		<div style="clear: both;"></div>
+
+		<table>
+		<caption>서비스 담당자 정보 <button type="button" class="btn small">판매처 정보 복사</button></caption>
+		<tbody>
+			<tr>
+				<th>판매처</th>
+				<td><input type="text"></td>
+				<th>사용 구분</th>
+				<td><label><input type="checkbox">테스트 사용</label></td>
+			</tr>
+			<tr>
+				<th>발급요청서명</th>
+				<td colspan="3"><input type="text"  size="120"></td>
+			</tr>
+		</tbody>
+		</table>
+	
+	
+	</form>
+
+</body>
+</html>

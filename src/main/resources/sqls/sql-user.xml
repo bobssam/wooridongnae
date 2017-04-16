@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="user">
+    <resultMap type="MemberVo" id="memberVo" />
+    <resultMap type="CategoryVO" id="category" />
+
+    <select id="view" resultMap="memberVo">
+		SELECT
+			id,
+			name,
+			pw,
+			member_no,
+			name,
+			phone_no,
+			want_area,
+			type,
+			iphone_token,
+			android_token,
+			push_yn,
+			login_date,
+			reg_date,
+			grade,
+			corp_number,
+			corp_name,
+			point,
+			memo,
+			tel,
+			file_no,
+			category_no1,
+			category_no2,
+			category_no3,
+			(SELECT category_name FROM category WHERE category_no = category_no1) AS category_no1_name,
+			(SELECT category_name FROM category WHERE category_no = category_no2) AS category_no2_name
+		FROM
+			member
+		WHERE
+			1 = 1
+			<if test="where.id != null and where.id != ''">
+			AND id = #{where.id}
+			</if>
+			<if test="where.memberNo != null and where.memberNo != ''">
+			AND member_no = #{where.memberNo}
+			</if>
+		LIMIT 1
+    </select>
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM member
+    	WHERE
+			1 = 1
+			<if test="where.categoryNo2 != null and where.categoryNo2 != ''">
+			AND category_no2 != #{where.categoryNo2}
+			</if>
+			<if test="where.type != null and where.type != ''">
+			AND type = #{where.type}
+			</if>
+			<if test="where.name != null and where.name != ''">
+			AND name like CONCAT('%', #{where.name}, '%')
+			</if>
+	</select>
+    <select id="list" resultMap="memberVo">
+		SELECT
+			id,
+			name,
+			pw,
+			member_no,
+			type,
+			iphone_token,
+			android_token,
+			push_yn,
+			login_date,
+			reg_date,
+			grade,
+			corp_number,
+			point,
+			memo,
+			tel,
+			file_no,
+			category_no1,
+			category_no2,
+			category_no3,
+			(SELECT category_name FROM category WHERE category_no = category_no1) AS category_no1_name,
+			(SELECT category_name FROM category WHERE category_no = category_no2) AS category_no2_name
+
+		FROM
+			member
+		WHERE
+			1=1
+			<if test="where.categoryNo2 != null and where.categoryNo2 != ''">
+			AND category_no2 != #{where.categoryNo2}
+			</if>
+			<if test="where.type != null and where.type != ''">
+			AND type = #{where.type}
+			</if>
+			<if test="where.name != null and where.name != ''">
+			AND name like CONCAT('%', #{where.name}, '%')
+			</if>
+		ORDER BY member_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="listCategory3" resultMap="category">
+
+	    SELECT B.*
+			FROM member_category_no3  AS A
+			JOIN category  AS B
+			ON A.category_no = B.category_no
+			WHERE member_no = #{where.memberNo}
+	</select>
+	<insert id="insert">
+		INSERT INTO member(
+			id,
+			pw,
+			name,
+			phone_no,
+			want_area,
+			type,
+			push_yn,
+			login_date,
+			reg_date,
+			grade,
+			corp_number,
+			corp_name,
+			tel,
+			file_no
+		)
+		VALUES (
+			#{id},
+			PASSWORD(#{pw}),
+			#{name},
+			#{phoneNo},
+			#{wantArea},
+			#{type},
+			'Y',
+			#{loginDate},
+			now(),
+			0,
+			#{corpNumber},
+			#{corpName},
+			#{tel},
+			#{fileNo}
+		)
+    </insert>
+	<update id="modify">
+		UPDATE member
+		SET
+		<if test="id != null and id != ''">
+			id = #{id},
+		</if>
+		<if test="pw != null and pw != ''">
+			pw = PASSWORD(#{pw}),
+		</if>
+		<if test="type != null and type != ''">
+			type = #{type},
+		</if>
+		<if test="categoryNo1 != null and categoryNo1 != ''">
+			category_no1 = #{categoryNo1},
+		</if>
+		<if test="categoryNo2 != null and categoryNo2 != ''">
+			category_no2 = #{categoryNo2},
+		</if>
+
+			name = #{name},
+			phone_no = #{phoneNo},
+			want_area = #{wantArea},
+			iphone_token = #{iphoneToken},
+			android_token = #{androidToken},
+			grade = #{grade},
+			corp_number = #{corpNumber},
+			corp_name = #{corpName},
+			memo = #{memo},
+			push_yn = #{pushYn},
+			tel = #{tel}
+
+		WHERE
+			member_no = #{where.memberNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM member
+		WHERE
+			member_no = #{where.memberNo}
+    </delete>
+	<update id="modifyUserArea">
+		UPDATE member
+		SET
+			want_area = #{wantArea}
+			<if test="categoryNo1 != null and categoryNo1 != ''">
+			,category_no1 = #{categoryNo1}
+			</if>
+			<if test="categoryNo2 != null and categoryNo2 != ''">
+			,category_no2 = #{categoryNo2}
+			</if>
+
+		WHERE
+			member_no = #{where.memberNo}
+    </update>
+	<update id="modifyUserInfo">
+		UPDATE member
+		SET
+		<if test="pw != null and pw != ''">
+			pw = PASSWORD(#{pw}),
+		</if>
+		<if test="tel != null and tel != ''">
+			tel = #{tel},
+		</if>
+			corp_name = #{corpName},
+			push_yn = #{pushYn}
+
+		WHERE
+			member_no = #{where.memberNo}
+    </update>
+
+    <select id="login" resultMap="memberVo">
+        SELECT
+        	member_no,
+        	id,
+        	pw,
+        	name,
+        	phone_no,
+        	want_area,
+        	type,
+        	iphone_token,
+        	android_token,
+        	push_yn,
+        	login_date,
+        	reg_date,
+        	grade,
+        	corp_number,
+        	corp_name,
+        	point,
+        	memo,
+        	file_no,
+        	tel
+        FROM
+        	member
+
+        WHERE
+        	id = #{id}
+        AND pw = password(#{pw})
+    </select>
+    <select id="findUser" resultType="int">
+        SELECT
+        	member_no
+        FROM
+        	member
+
+        WHERE
+        	id = #{id}
+        AND phone_no = #{phoneNo}
+    </select>
+    <select id="findUserId" resultType="string">
+
+    	SELECT id FROM member
+    	WHERE
+			phone_no = #{phoneNo}
+	</select>
+    <update id="updatePassword">
+    	UPDATE member
+    	SET
+    		pw = password(#{pw})
+    	WHERE
+    		member_no = #{memberNo}
+    </update>
+    <update id="updateLoginDate">
+    	UPDATE member
+    	SET
+    		login_date = now()
+    	WHERE
+    		member_no = #{memberNo}
+    </update>
+    <select id="duplicate" resultType="int">
+    	SELECT
+    		COUNT(1)
+    	FROM
+    		member
+    	WHERE
+    		id = #{id}
+    </select>
+    <update id="updateRegId">
+        UPDATE member
+        SET
+        	android_token = #{androidToken}
+        WHERE member_no = #{memberNo}
+    </update>
+    <select id="selectAllRegId" resultMap="memberVo">
+        SELECT
+        	android_token
+        FROM member
+        WHERE
+        	android_token IS NOT NULL
+    </select>
+    <delete id="clearCategory3">
+    	DELETE FROM
+    		member_category_no3
+   		WHERE member_no = #{memberNo}
+    </delete>
+	<insert id="insertCategory3">
+		INSERT INTO member_category_no3 (member_no, category_no)
+		VALUES (#{memberNo}, #{categoryNo})
+	</insert>
+</mapper>

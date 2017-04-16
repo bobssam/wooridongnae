@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration scan="true" scanPeriod="30 seconds">
+	<property name="suba.log.dir" value="/home/hosting_users/hyukxix/www" />
+	<property name="suba.console.log.file" 	value="static.log" />
+
+	<!-- Console 로그 설정 -->
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<charset>UTF-8</charset>
+		<immediateFlush>true</immediateFlush>
+
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d][%t] %-6p%m%n</pattern>
+		</layout>
+	</appender>
+
+	<!--매일 날짜별 로그 설정(콘솔에 모든 출력) -->
+	<appender name="consoleDailyFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${suba.log.dir}/${suba.console.log.file}</file>
+		<charset>UTF-8</charset>
+		<immediateFlush>true</immediateFlush>
+		<append>true</append>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${suba.log.dir}/back/${suba.console.log.file}.%d{yyyy-MM-dd}.zip</FileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d][%t] %-6p%m%n</pattern>
+		</layout>
+	</appender>
+
+	<logger name="suba.console.log.file" level="DEBUG">
+		<appender-ref ref="consoleDailyFile" />
+	</logger>
+
+	<!-- Root Logger 설정 및 추가 -->
+    <root level="DEBUG">
+    	  <appender-ref ref="stdout" />
+<!--            <appender-ref ref="consoleDailyFile" /> -->
+    </root>
+
+</configuration>

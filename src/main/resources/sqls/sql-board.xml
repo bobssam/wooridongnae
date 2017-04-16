@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+    <resultMap type="com.suba.vo.BoardVO" id="boardVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM board
+    	WHERE
+    		is_use = 'Y'
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		<if test='where.content != null and where.content != ""' >
+			AND content like '%${where.content}%'
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND q.member_no = #{where.memberNo}
+		</if>
+		<if test="where.category != null and where.category != ''" >
+			AND category = #{where.category}
+		</if>
+	</select>
+    <select id="list" resultMap="boardVO">
+		SELECT
+			board_no,
+			n.reg_date,
+			n.member_no,
+			m.id,
+			m.name,
+			title,
+			is_notice,
+			hits,
+			category,
+			is_use,
+			reply_count
+		FROM
+			board n
+			JOIN member m
+			ON n.member_no = m.member_no
+    	WHERE
+    		is_use = 'Y'
+		<if test='where.title != null and where.title != ""' >
+			AND title like '%${where.title}%'
+		</if>
+		<if test='where.content != null and where.content != ""' >
+			AND content like '%${where.content}%'
+		</if>
+		<if test='where.isAnswer == "Y"' >
+			AND answer is not null
+		</if>
+		<if test='where.isAnswer == "N"' >
+			AND answer is null
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''" >
+			AND q.member_no = #{where.memberNo}
+		</if>
+		<if test="where.category != null and where.category != ''" >
+			AND category = #{where.category}
+		</if>
+		ORDER BY is_notice DESC, board_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <insert id="insert">
+    	INSERT INTO board (board_no, reg_date, member_no, title, content, category, is_use)
+    	VALUES
+    		(
+    			#{boardNo},
+    			NOW(),
+    			#{memberNo},
+    			#{title},
+    			#{content},
+    			#{category},
+    			'Y'
+
+    		)
+    </insert>
+	<update id="modify">
+		UPDATE board
+		SET
+			title = #{title},
+			content = #{content},
+			<if test='isUse != null and isUse != ""' >
+			is_use = #{isUse},
+			</if>
+			category = #{category}
+
+		WHERE
+			board_no = #{where.boardNo}
+    </update>
+    <delete id="delete">
+    	DELETE FROM board
+    	WHERE
+    		board_no = #{boardNo}
+    </delete>
+    <select id="view" resultMap="boardVO">
+		SELECT
+			board_no,
+			n.reg_date,
+			n.member_no,
+			m.id,
+			m.name,
+			title,
+			content,
+			answer,
+			is_notice,
+			hits,
+			category,
+			is_use,
+			reply_count
+
+		FROM
+			board n
+			JOIN member m
+			ON n.member_no = m.member_no
+    	WHERE
+			n.board_no = #{where.boardNo}
+   	</select>
+    <select id="selectMainNotice" resultMap="boardVO">
+    	SELECT
+			board_no,
+			n.reg_date,
+			n.member_no,
+			title,
+			content,
+			answer,
+			is_notice,
+			hits,
+			category,
+			is_use
+		FROM
+			notice n
+		WHERE is_notice = 'Y'
+    	ORDER BY is_notice DESC, board_no DESC
+    	LIMIT 4
+    </select>
+    <update id="plusHit">
+		UPDATE board
+		SET
+			hits = hits+1
+		WHERE
+			board_no = #{boardNo}
+    </update>
+    <update id="plusReplyCount">
+		UPDATE board
+		SET
+			reply_count = reply_count+1
+		WHERE
+			board_no = #{boardNo}
+    </update>
+     <update id="minersReplyCount">
+		UPDATE board
+		SET
+			reply_count = reply_count-1
+		WHERE
+			board_no = #{boardNo}
+			AND reply_count > 0
+    </update>
+</mapper>

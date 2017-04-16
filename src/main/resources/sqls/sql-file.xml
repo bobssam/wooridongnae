@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="file">
+    <resultMap type="com.suba.vo.FileVO" id="FileVO"/>
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM file
+
+	</select>
+    <select id="list" resultMap="FileVO">
+		SELECT
+			file_no,
+			reg_date,
+			path,
+			size,
+			member_no,
+			board_type,
+			board_no,
+			board_no2
+		FROM
+			file
+		ORDER BY file_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="FileVO">
+		SELECT
+			file_no,
+			reg_date,
+			path,
+			size,
+			member_no,
+			board_type,
+			board_no,
+			board_no2
+		FROM
+			file
+		WHERE
+			file_no = #{fileNo}
+    </select>
+	<insert id="insert">
+		INSERT INTO file(
+			reg_date,
+			path,
+			size,
+			member_no,
+			board_type,
+			board_no,
+			board_no2
+		)
+		VALUES (
+			now(),
+			#{path},
+			#{size},
+			#{memberNo},
+			#{boardType},
+			#{boardNo},
+			#{boardNo2}
+		)
+	    <selectKey resultType="int" keyProperty="fileNo" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+    </insert>
+	<update id="modify">
+		UPDATE file
+		SET
+			reg_date = now(),
+			path = #{path},
+			size = #{size}
+
+		WHERE
+			file_no = #{fileNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM file
+		WHERE
+			file_no = #{fileNo}
+    </delete>
+
+    <update id="modifyTender">
+		UPDATE tender
+			SET file_no = #{fileNo}
+		WHERE
+			tender_no = #{where.tenderNo}
+    </update>
+	<update id="modifyTenderReply">
+		UPDATE tender_reply
+			SET file_no = ${fileNo}
+		WHERE
+			tender_no = #{where.tenderNo}
+			AND tender_seq = #{where.tenderSeq}
+    </update>
+	<update id="modifyNotice">
+		UPDATE notice
+			SET file_no = #{fileNo}
+		WHERE
+			tender_no = #{where.boardNo}
+    </update>
+	<update id="modifyFaq">
+		UPDATE faq
+			SET file_no = #{fileNo}
+		WHERE
+			tender_no = #{where.boardNo}
+    </update>
+	<update id="modifyQna">
+		UPDATE qna
+			SET file_no = #{fileNo}
+		WHERE
+			tender_no = #{where.boardNo}
+    </update>
+	<update id="modifyDealer">
+		UPDATE member
+			SET file_no = #{fileNo}
+		WHERE
+			member_no = #{where.memberNo}
+    </update>
+
+
+</mapper>

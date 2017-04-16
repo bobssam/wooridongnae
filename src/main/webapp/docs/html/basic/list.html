@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+<h2>공통 <span>리스트</span></h2>
+<address>[apiName]<b>/list</b></address>
+
+	<h3>리스트</h3>
+	<p>
+		리스트형 데이터를 반환합니다.	
+	</p>
+
+
+	
+	<h4>요청</h4>
+	<pre>{
+	"page":1,
+	"len":10,  // 옵션입니다.
+	"filter": {}, // 옵션입니다.
+	"oreder": [{"idx":"desc"}], // 옵션입니다.
+}</pre>
+	<p>
+		<b>page</b> 페이지는 뭡니다<br/>
+		<b>len</b> 로딩할 길이 입니다. <br/>
+		<b>filter</b> 검색어를 입력하여서 필요한 데이터만 요청합니다.<br/>
+		<b>order</b> 정렬 조건을 추가합니다.<br/>
+	</p>
+
+
+	<h4>정상응답</h4>
+	<pre>{
+	"status" : "ok",
+	"total": 100,	// 옵션
+	"list" : [{"key":"value"}]
+}</pre>
+	<p>
+		<b>total</b> 전체 글 크기 입니다. API에 따라선 총길이를 반환하지 않아도 됩니다.<br/>
+		<b>list</b> 리스트 내용입니다. 내용물은 API 마다 다릅니다.<br/>
+	</p>
+
+
+
+	<h4>에러응답 - 데이터 없음</h4>
+	<pre>
+{
+	"status": "fail",
+	"reason":"데이터가 없습니다."
+}</pre>
+
+
+</body>
+</html>

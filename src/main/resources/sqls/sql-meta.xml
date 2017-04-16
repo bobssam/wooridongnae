@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="meta">
+    <resultMap type="com.suba.vo.MetaVO" id="metaVO">
+		<result property="field" column="Field"/>
+		<result property="type" column="Type"/>
+		<result property="comment" column="Comment"/>
+	</resultMap>
+    <select id="getMeta" resultMap="metaVO">
+    
+    SHOW FULL  COLUMNS FROM ${tableName}
+    	
+	</select>
+</mapper>

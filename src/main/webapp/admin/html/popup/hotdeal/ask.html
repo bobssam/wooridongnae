@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var url = '/api/hotdealask/modify';
+	var data = obj.data;
+
+	$body.find('select[name=isAnswer]').options({'Y':'답변완료','N':'답변전'});
+
+
+	// 신규
+	if( obj.data.type == 'new' ) {
+		$body.find('input[name=codeSeq]').disabled();
+		$body.find('.onlyModify').remove();
+	} else {
+
+		$.ajax({
+			url : apiRoot+ '/api/hotdealask/view',
+			data : {where: JSON.stringify({hotdealAskNo:obj.data.hotdealAskNo})},
+			dataType: 'json',
+			async: false,
+			success:function(datas) {
+				if( datas.status == 'ok' ) {
+					data = datas.data;
+					$body.formData(data);
+				}
+			}
+		});
+	}
+
+	$body.find('form').on('submit', function(){
+
+		var datas = $body.formData();
+		if( obj.data.type == 'new' )
+			obj.data.parent.add( datas, obj.data.callback );
+		else
+			obj.data.parent.modify( {hotdealAskNo:datas.hotdealAskNo}, datas, obj.data.callback );
+		return false;
+
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form" enctype="multipart/form-data">
+	<table>
+	<caption>데이터 수정</caption>
+	<tr class="onlyModify">
+		<th>문의번호</th>
+		<td><input name="hotdealAskNo" type="text" readonly="readonly"></td>
+	</tr>
+	<tr class="onlyModify">
+		<th>등록일</th>
+		<td data-name="regDate" data-formatter="timeConv"></td>
+	</tr>
+	<tr>
+		<th>구입시기</th>
+		<td data-name="wantDate" data-formatter="timeConv"></td>
+	</tr>
+	<tr>
+		<th>선입금</th>
+		<td data-name="prePrice"></td>
+	</tr>
+	<tr>
+		<th>계약기간</th>
+		<td data-name="contractDuration"></td>
+	</tr>
+	<tr>
+		<th>요청사항</th>
+		<td data-name="ask" data-formatter="brConv"></td>
+	</tr>
+
+	<tr>
+		<th>답변여부</th>
+		<td><select name="isAnswer"></select></td>
+	</tr>
+
+	<tr>
+		<th>메모</th>
+		<td><textarea name="memo" cols="70" rows="5"></textarea></td>
+	</tr>
+	</table>
+	<div class="btns">
+
+		<button type="submit" class="btn confirm">수정</button>
+		<button type="button" class="btn gray cancel">취소</button>
+
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

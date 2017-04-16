@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cropReply">
+    <resultMap type="com.suba.vo.CropReplyVO" id="cropReplyVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM crop_reply
+    	WHERE
+			crop_no = #{where.cropNo}
+
+	</select>
+    <select id="list" resultMap="cropReplyVO">
+		SELECT
+			n.crop_no,
+			n.reply_no,
+			n.member_no,
+			m.id,
+			m.name,
+			n.reg_date,
+			n.content
+
+		FROM
+			crop_reply n
+			JOIN member m
+			ON n.member_no = m.member_no
+    	WHERE
+			crop_no = #{where.cropNo}
+
+		ORDER BY reply_no ASC
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="cropReplyVO">
+		SELECT
+			n.crop_no,
+			n.reply_no,
+			n.member_no,
+			m.id,
+			m.name,
+			n.reg_date,
+			n.content
+		FROM
+			crop_reply n
+			JOIN member m
+			ON n.member_no = m.member_no
+    	WHERE
+			n.reply_no = #{replyNo}
+   	</select>
+    <insert id="add">
+    	INSERT INTO crop_reply (crop_no, member_no, reg_date,	content)
+    	VALUES
+    		(
+    			#{cropNo},
+    			#{memberNo},
+    			NOW(),
+    			#{content}
+
+    		)
+	    <selectKey resultType="int" keyProperty="replyNo" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+   	</insert>
+    <delete id="delete">
+    	DELETE FROM crop_reply
+    	WHERE
+			reply_no = #{replyNo}
+   	</delete>
+</mapper>

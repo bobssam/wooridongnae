@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">
+
+$(function(jo, obj){
+		
+	var $body = obj.$body;
+	var bigAreaBoard = null;
+	var smallAreaBoard = null;
+	var bigAreaNo = 0;
+	
+	{
+		var $tbody = $body.find('.bigarea tbody');
+		$body.find('.bigarea').makeCheckAll();
+
+		bigAreaBoard = $tbody.board({
+			page: 1,
+			len: 10,
+			api: '/api/bigarea/',
+			template: $body.find('.tmpl_notice'),
+			paging: $body.find('.pageing'),
+			onRender : function( $tar, datas ) {
+				
+				// 큰 지역 선택
+				$tar.find('a').on('click', function(){
+					bigAreaNo = datas.bigAreaNo;
+					smallAreaBoard.setFilter({bigAreaNo:datas.bigAreaNo});
+					smallAreaBoard.load(1);
+					$body.find('.smallarea h2 span').text($(this).text());
+					return false;
+				});
+				// 수정
+				$tar.find('button').on('click', function(){
+					datas.parent = bigAreaBoard;
+					datas.callback = function(res, datas) {
+						if( res ) {
+							bigAreaBoard.reload();
+							$dialog.dialog('close');
+							toastr.success('수정 성공');
+						}
+					}
+					
+					var $dialog = $.loadDialog({
+						popup: 'code/bigarea',
+						data:datas,
+						width:'auto',
+					});
+				});
+			}
+		});
+		
+		bigAreaBoard.load();
+		$body.find('.bigarea button.del').on('click', function(){
+			
+			var $list = $body.find('input[type=checkbox]:checked');
+			if( $list.length > 0 && confirm('선택된 글을 삭제하시겠습니까?') ) {
+				
+				var docount = $list.length;
+				$list.each(function(i){
+					
+					var $this = $(this).closest('tr');
+					var data = $this.data('data');
+					
+					bigAreaBoard.remove(data, function(res, datas){
+						if( res ) {
+							toastr.success( '삭제됨' );
+							bigAreaBoard.reload();
+						}
+						if( --docount == 0 )
+							bigAreaBoard.reload();
+					});
+			
+				});
+			}
+		});
+		
+		// 신규
+		$body.find('.bigarea button.add').on('click', function(){
+			var data = {type:'new', parent:bigAreaBoard};
+			var $dialog = null;
+			data.callback = function(res, datas) {
+				if( res ) {
+					$dialog.dialog('close');
+					bigAreaBoard.reload();
+					toastr.success( '코드 추가 성공' );
+				}
+			};
+			
+			$dialog = $.loadDialog({
+				title: '신규등록',
+				popup:'code/bigarea',
+				width:'auto',
+				data:data
+			});
+		});
+	}
+	
+	{
+		var $tbody = $body.find('.smallarea tbody');
+		$body.find('.smallarea').makeCheckAll();
+		smallAreaBoard = $tbody.board({
+			page: 1,
+			len: 10,
+			api: '/api/smallarea/',
+			template: $body.find('.tmpl_small'),
+			paging: $body.find('.pageing'),
+			onRender : function( $tar, datas ) {
+				
+				// 수정
+				$tar.find('button').on('click', function(){
+					datas.parent = smallAreaBoard;
+					datas.callback = function(res, datas) {
+						if( res ) {
+							smallAreaBoard.reload();
+							$dialog.dialog('close');
+							toastr.success('수정 성공');
+						}
+					}
+					
+					var $dialog = $.loadDialog({
+						popup: 'code/smallarea',
+						data:datas,
+						width:'auto',
+					});
+				});
+			}
+		});
+		
+		$body.find('.smallarea button.del').on('click', function(){
+			
+			var $list = $body.find('input[type=checkbox]:checked');
+			if( $list.length > 0 && confirm('선택된 글을 삭제하시겠습니까?') ) {
+				
+				var docount = $list.length;
+				$list.each(function(i){
+					
+					var $this = $(this).closest('tr');
+					var data = $this.data('data');
+					
+					smallAreaBoard.remove(data, function(res, datas){
+						if( res ) {
+							toastr.success( '삭제됨' );
+							smallAreaBoard.reload();
+						}
+						if( --docount == 0 )
+							smallAreaBoard.reload();
+					});
+			
+				});
+			}
+		});
+		
+		// 신규
+		$body.find('.smallarea button.add').on('click', function(){
+			var data = {type:'new', parent:smallAreaBoard, bigAreaNo:bigAreaNo};
+			var $dialog = null;
+			data.callback = function(res, datas) {
+				if( res ) {
+					$dialog.dialog('close');
+					smallAreaBoard.reload();
+					toastr.success( '코드 추가 성공' );
+				}
+			};
+			
+			$dialog = $.loadDialog({
+				title: '신규등록',
+				popup:'code/smallarea',
+				width:'auto',
+				data:data
+			});
+		});
+	}	
+	
+});
+
+</script>
+</head>
+<body>
+
+
+	<div class="bigarea" style="float: left">
+		<h2>큰 지역범위</h2>
+
+		<div class="data_grid">
+		
+			<div class="header">
+				<button type="button" class="btn add">등록하기</button>
+				<button type="button" class="btn red del">삭제하기</button>
+				<button type="button" class="btn green"><i class="fa fa-file-excel-o"></i> 엑셀 다운로드</button>
+			</div>
+			
+			<table class="list">
+				<thead>
+					<tr>
+						<th width="30"><input name="check" type="checkbox"></th>
+						<th width="30">번호</th>
+						<th>지역명</th>
+						<th width="50"></th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		
+		<p>
+			지역명을 선택하신후 
+			작은 지역 범위를 수정하세요
+		</p>
+	
+	</div>
+	<div class="smallarea" style="float: left; margin-left: 10px;">
+
+		<h2>작은 지역범위 > <span></span></h2>
+
+		<div class="data_grid">
+		
+			<div class="header">
+				<button type="button" class="btn add">등록하기</button>
+				<button type="button" class="btn red del">삭제하기</button>
+				<button type="button" class="btn green"><i class="fa fa-file-excel-o"></i> 엑셀 다운로드</button>
+			</div>
+			
+			<table class="list">
+				<thead>
+					<tr>
+						<th width="30"><input name="check" type="checkbox"></th>
+						<th width="30">상위번호</th>
+						<th width="30">번호</th>
+						<th>지역명</th>
+						<th width="50"></th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<div class="pageing"></div>
+		</div>
+		
+		<p>
+			지역이 한번 설정되면, 코드로 엮이기 때문에 사용중인 지역은 삭제하지 않는것이 좋습니다.
+		</p>		
+
+	</div>
+	<div style="clear: both"></div>
+	
+
+<script type="text/html" class="tmpl_notice">
+<tr>
+	<td><input name="check" type="checkbox"></td>
+	<td>${bigAreaNo}</td>
+	<td class="text"><a href="#">${bigAreaName}</a></td>
+	<td><button type="button" class="btn ssmall">수정</button></td>
+</tr>
+</script>
+	
+<script type="text/html" class="tmpl_small">
+<tr>
+	<td><input name="check" type="checkbox"></td>
+	<td>${bigAreaNo}</td>
+	<td>${smallAreaNo}</td>
+	<td class="text">${smallAreaName}</td>
+	<td><button type="button" class="btn ssmall">수정</button></td>
+</tr>
+</script>
+	
+	
+</body>
+</html>

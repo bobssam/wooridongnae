@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="statics">
+    <resultMap type="com.suba.vo.StaticsVO" id="StaticsVO" />
+    <select id="total" resultType="int">
+    	SELECT COUNT(*) FROM statics
+	</select>
+    <select id="list" resultMap="StaticsVO">
+		SELECT
+			ymd,
+			login_count,
+			reg_count,
+			payment_price,
+			payment_count
+		FROM
+			statics
+		ORDER BY seq DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="insert">
+		INSERT INTO statics (
+			ymd,
+			login_count,
+			reg_count,
+			payment_price,
+			payment_count
+		)
+		VALUES (
+			#{ymd},
+			#{loginCount},
+			#{regCount},
+			#{paymentPrice},
+			#{paymentCount}
+		)
+    </insert>
+	<update id="modify">
+		UPDATE statics
+		SET
+			login_count = login_count+#{loginCount},
+			reg_count = reg_count+#{regCount},
+			payment_price = payment_price+#{paymentPrice},
+			payment_count = payment_count+#{paymentCount}
+		WHERE
+			ymd = #{ymd}
+    </update>
+    <delete id="delete">
+		DELETE FROM statics
+		WHERE
+			ymd = #{ymd}
+    </delete>
+</mapper>

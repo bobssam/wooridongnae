@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cropWorkPic">
+    <resultMap type="com.suba.vo.CropWorkPicVO" id="cropWorkPicVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM crop_work_pic
+    	WHERE
+			crop_no = #{where.cropNo}
+
+	</select>
+    <select id="list" resultMap="cropWorkPicVO">
+		SELECT
+			crop_no,
+			crop_work_pic_no,
+			file_no,
+			reg_date
+
+		FROM
+			crop_work_pic
+    	WHERE
+			crop_no = #{where.cropNo}
+
+		ORDER BY crop_work_pic_no DESC
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="cropWorkPicVO">
+		SELECT
+			crop_no,
+			crop_work_pic_no,
+			file_no,
+			reg_date,
+			content
+		FROM
+			crop_work_pic
+    	WHERE
+			crop_work_pic_no = #{cropWorkPicNo}
+   	</select>
+    <insert id="add">
+    	INSERT INTO crop_work_pic (crop_no, file_no, reg_date, content)
+    	VALUES
+    		(
+    			#{cropNo},
+    			#{fileNo},
+    			NOW(),
+    			#{content}
+
+    		)
+	    <selectKey resultType="int" keyProperty="cropWorkPicNo" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+   	</insert>
+    <update id="modify">
+    	UPDATE crop_work_pic SET
+    		content = #{content},
+    		file_no = #{fileNo}
+    	WHERE
+			crop_work_pic_no = #{where.cropWorkPicNo}
+   	</update>
+    <delete id="delete">
+    	DELETE FROM crop_work_pic
+    	WHERE
+			crop_work_pic_no = #{where.cropWorkPicNo}
+   	</delete>
+</mapper>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var data = obj.data;
+
+	// id만 보낸경우
+	//if( data.id && !data.memberNo )
+	$.ajax({
+		url : apiRoot+ '/api/user/view',
+		data : {where: JSON.stringify({memberNo:data.memberNo})},
+		dataType: 'json',
+		async: false,
+		success:function(datas) {
+			if( datas.status == 'ok' ) {
+				data = datas.data;
+			}
+		}
+	});
+	loadCategory(1, 0);
+	if( data.categoryNo1 ) loadCategory(2, data.categoryNo1);
+	if( data.categoryNo2 ) loadCategory3(data.categoryNo2);
+
+	$body.find('select[name=pushYn]').options({'Y':'사용','N':'미사용'});
+	$body.formData(data);
+
+	// 유저의 3차 카테고리를 따로 부름
+	$.ajax({
+		url : apiRoot+ '/api/user/listCategory3',
+		data : {where: JSON.stringify({memberNo:data.memberNo})},
+		dataType: 'json',
+		async: false,
+		success:function(datas) {
+			var cates = [];
+			if( datas.status == 'ok' ) {
+				for( var i=0,len=datas.list.length;i<len;i++ )
+					cates.push( datas.list[i].categoryNo );
+			}
+			// 복수형 선택 구현
+			$body.formData( {categoryNo3:cates} );
+		}
+	});
+
+	$body.find('[name=categoryNo3]').setMaxCheck(5);
+	$body.find('[name=regDate]').val( timeConv(data.regDate) );
+	$body.find('[name=loginDate]').val( timeConv(data.loginDate) );
+
+	if( data.type == 1 ) {
+		$body.find('.onlyDealer').hide();
+	}
+
+	$body.find('.pointSend,.sendNote').on('click', function(){
+
+		var d = {memberNo:data.memberNo};
+		var $dialog = null;
+		d.callback = function(res, datas) {
+			if( res ) {
+				$dialog.dialog('close');
+				board.reload();
+				toastr.success( '코드 추가 성공' );
+			}
+		};
+
+		$dialog = $.loadDialog({
+			title: '쪽지보내기',
+			popup:'note/note',
+			width:'auto',
+			data:d
+		});
+
+	});
+
+	// 신규
+	if( data.type == 'new' ) {
+		$body.find('.confirm').text('작성');
+		$body.find('.onlyModify').remove();
+	} else {
+		$body.find('input[name=regDate]').disabled();
+	}
+
+	$body.find('form').on('submit', function(){
+
+		var datas = $body.formData();
+		if( obj.data.type == 'new' )
+			obj.data.parent.add( datas, obj.data.callback );
+		else
+			obj.data.parent.modify( {memberNo:datas.memberNo}, datas, obj.data.callback );
+		return false;
+
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+
+	// 로그인 이력보기
+	$body.find('.login_log').on('click', function(){
+
+		var datas = { isPopup:true, filter:{memberNo:data.memberNo} };
+		var $dialog = $.loadDialog({
+			title: '로그인 로그',
+			popup:'../etc/login_log',
+			width:800,
+			data:datas
+		});
+
+	});
+
+	$body.find('.tender').on('click', function(){
+
+		var datas = { isPopup:true, filter:{memberNo:data.memberNo} };
+		var $dialog = $.loadDialog({
+			title: '입찰 이력 로그',
+			popup:'../tender/log',
+			width:800,
+			data:datas
+		});
+
+	});
+
+	$body.find('.payment').on('click', function(){
+
+		var datas = { isPopup:true, filter:{memberNo:data.memberNo} };
+		var $dialog = $.loadDialog({
+			title: '결제 로그',
+			popup:'../payment/list',
+			width:800,
+			data:datas
+		});
+
+	});
+
+
+	function loadCategory( depth, parentCategoeryNo ) {
+
+		$body.find('[name=categoryNo'+depth+']').empty().optionsApi({
+			api: '/api/category/',
+			value: 'categoryName',
+			key: 'categoryNo',
+			async: false,
+			filter : {'parentCategoryNo': parentCategoeryNo},
+		}, function( datas ){
+
+		});
+	}
+
+	function loadCategory3( parentCategoeryNo ) {
+
+		$body.find('.categoryNo3').empty().checkboxApi({
+			api: '/api/category/',
+			value: 'categoryName',
+			key: 'categoryNo',
+			name : 'categoryNo3',
+			async: false,
+			filter : {'parentCategoryNo': parentCategoeryNo},
+		}, function( datas ){
+		});
+	}
+
+	$body.find('[name=categoryNo1]').on('change', function(){
+		loadCategory(2, $(this).val());
+	});
+	$body.find('[name=categoryNo2]').on('change', function(){
+		loadCategory3( $(this).val());
+	});
+
+
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<table>
+	<caption>데이터 수정</caption>
+	<tr class="onlyModify">
+		<th>번호</th>
+		<td><input name="memberNo" type="text" readonly="readonly"></td>
+		<th>포인트</th>
+		<td><input name="point" type="text" disabled="disabled">
+			<button type="button" class="btn ssmall pointSend">포인트 지급</button>
+		</td>
+	</tr>
+	<tr>
+		<th>가입일</th>
+		<td><input name="regDate" type="text" disabled="disabled"></td>
+		<th>로그인 일시</th>
+		<td><input name="loginDate" type="text" disabled="disabled"></td>
+	</tr>
+	<tr>
+		<th>아이디</th>
+		<td><input type="text" name="id" disabled="disabled"></td>
+		<th>이름</th>
+		<td><input type="text" name="name"></td>
+	</tr>
+	<tr>
+		<th>푸시사용</th>
+		<td><select name="pushYn"></select></td>
+		<th>구분</th>
+		<td><input name="grade" type="text" readonly="readonly"></td>
+	</tr>
+	<tr>
+		<th>아이폰 토큰</th>
+		<td colspan="3"><input name="iphoneToken" type="text" size="50"></td>
+	</tr>
+	<tr>
+		<th>안드로이드 토큰</th>
+		<td colspan="3"><input name="androidToken" type="text" size="50"></td>
+	</tr>
+	<tr class="onlyDealer">
+		<th>사업자명</th>
+		<td colspan="3"><input name="corpName" type="text" size="50"></td>
+	</tr>
+	<tr class="onlyDealer">
+		<th>사업자 등록번호</th>
+		<td colspan="3"><input name="corpNumber" type="text" size="50"></td>
+	</tr>
+
+	<tr class="onlyDealer">
+		<th>구분1</th>
+		<td colspan="3"><select name="categoryNo1"></select></td>
+	</tr>
+		<tr class="onlyDealer">
+		<th>구분1</th>
+		<td colspan="3"><select name="categoryNo2"></select></td>
+	</tr>
+	<tr class="onlyDealer">
+		<th>구분3</th>
+		<td colspan="3" class="categoryNo3">
+		</td>
+	</tr>
+
+	<tr>
+		<th>이력보기</th>
+		<td colspan="3">
+
+			<div class="onlyDealer" style="margin-bottom: 3px">
+				<button type="button" class="btn green tender">입찰이력 보기 1건</button>
+				<button type="button" class="btn green payment">포인트 충전 이력 2건</button>
+
+			</div>
+
+			<button type="button" class="btn green login_log">로그인이력 보기</button>
+			<button type="button" class="btn green" disabled="disabled">QNA 0건</button>
+
+
+		</td>
+	</tr>
+	<tr>
+		<th>관리</th>
+		<td colspan="3">
+
+			<button type="button" class="btn red sendNote">쪽지보내기</button>
+			<button type="button" class="btn red onlyDealer">등급조정</button>
+
+
+		</td>
+	</tr>
+	<tr>
+		<th>메모</th>
+		<td colspan="3">
+
+			<textarea rows="6" cols="50" name="memo"></textarea>
+
+
+		</td>
+	</tr>
+
+	</table>
+	<div class="btns">
+
+		<button type="submit" class="btn confirm">수정</button>
+		<button type="button" class="btn gray cancel">취소</button>
+
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

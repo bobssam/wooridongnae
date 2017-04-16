@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tenderReply">
+    <resultMap type="com.suba.vo.TenderReplyVO" id="TenderReplyVO" />
+    <select id="total" resultType="int">
+    	SELECT COUNT(*) FROM tender_reply t
+		WHERE
+			1 = 1			
+		<if test="where.tenderNo != null and where.tenderNo != ''">
+			AND t.tender_no = #{where.tenderNo}
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''">
+			AND t.member_no = #{where.memberNo}
+		</if>
+    	
+	</select>
+    <select id="list" resultMap="TenderReplyVO">
+		SELECT
+			tender_no,
+			tender_seq,
+			t.reg_date,
+			t.member_no,
+     		m.id,
+			t.contents,
+			t.file_no
+		FROM
+			tender_reply t
+			JOIN member m
+			ON t.member_no = m.member_no
+			
+		WHERE
+			1 = 1			
+		<if test="where.tenderNo != null and where.tenderNo != ''">
+			AND t.tender_no = #{where.tenderNo}
+		</if>
+		<if test="where.memberNo != null and where.memberNo != ''">
+			AND t.member_no = #{where.memberNo}
+		</if>	
+			
+		ORDER BY tender_seq DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+	<insert id="insert">
+		INSERT INTO tender_reply (
+			tender_no,
+			tender_seq,
+			reg_date,
+			member_no,
+			contents,
+			file_no
+		)
+		SELECT
+			#{tenderNo},
+			IFNULL(MAX(tender_seq), 0)+1,
+			now(),
+			#{memberNo},
+			#{contents},
+			#{fileNo}
+		FROM
+			tender_reply
+		WHERE
+			tender_no = #{where.tenderNo}
+
+	    <selectKey resultType="int" keyProperty="tenderSeq" order="AFTER">
+	        SELECT MAX(tender_seq)
+			FROM
+				tender_reply
+			WHERE
+				tender_no = #{where.tenderNo}	        
+	    </selectKey>
+    </insert>
+	<update id="modify">
+		UPDATE tender_reply
+		SET
+			reg_date = now(),
+			member_no = #{memberNo},
+			contents = #{contents},
+			file_no = #{fileNo}
+		WHERE
+			tender_no = #{tenderNo}
+		AND tender_seq = #{tenderSeq}
+    </update>
+    <delete id="delete">
+		DELETE FROM tender_reply
+		WHERE
+			tender_no = #{where.tenderNo}
+		AND tender_seq = #{where.tenderSeq}
+    </delete>
+</mapper>

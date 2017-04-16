@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+	
+	var $body = obj.$body;
+	var data = obj.data;
+	
+	$.ajax({
+		url : apiRoot+ '/api/board/view',
+		data : {boardNo:obj.data.boardNo},
+		dataType: 'json',
+		async: false,
+		success:function(datas) {
+			if( datas.status == 'ok' ) {
+				data = datas.data;
+			}
+		}
+	});
+	
+	
+	$body.find('select[name=category]').options({'1':'유머게시판','2':'신차소식', '3':'차량 구입 노하우', '4':'출고 체크리스트', '5':'자동차 정비 상식', '6':'차량시승기'});
+	$body.find('select[name=isUse]').options({'Y':'사용','N':'비사용'});
+	$body.formData(data);
+	
+	// 신규
+	if( obj.data.type == 'new' ) {
+		$body.find('.confirm').text('작성');
+		$body.find('.onlyModify').remove();
+	} else {
+		$body.find('input[name=regDate]').disabled();
+	}
+	
+	$body.find('form').on('submit', function(){
+		
+		oEditors[0].exec("UPDATE_CONTENTS_FIELD", []);	// 에디터의 내용이 textarea에 적용됩니다.
+
+		var datas = $body.formData();
+		if( obj.data.type == 'new' )
+			obj.data.parent.add( datas, obj.data.callback );
+		else
+			obj.data.parent.modify( {boardNo:datas.boardNo}, datas, obj.data.callback );
+		return false;
+		
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+	
+	var oEditors = [];
+	setTimeout(function(){
+		var h = $body.height()-$body.find('form').height()-50;
+		console.log(h)
+		$body.find('textarea').height(h);
+		
+		
+		var editor = nhn.husky.EZCreator.createInIFrame({
+			oAppRef: oEditors,
+			elPlaceHolder: $body.find('[name=content]')[0],
+			sSkinURI: "plugin/se/SmartEditor2Skin.html",	
+			htParams : {
+				bUseToolbar : true,				// 툴바 사용 여부 (true:사용/ false:사용하지 않음)
+				bUseVerticalResizer : true,		// 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음)
+				bUseModeChanger : true,			// 모드 탭(Editor | HTML | TEXT) 사용 여부 (true:사용/ false:사용하지 않음)
+				fOnBeforeUnload : function(){
+					alert("완료!");
+				}
+			}, //boolean
+			fCreator: "createSEditor2"
+		});
+		
+	}, 1);
+
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<table>
+	<caption>데이터 수정</caption>
+	<tr class="onlyModify">
+		<th>번호</th>
+		<td><input name="boardNo" type="text" readonly="readonly"></td>
+		<th>등록일</th>
+		<td data-name="regDate" data-formatter="timeConv"></td>
+	</tr>
+	<tr>
+		<th>게시판 구분</th>
+		<td><select name="category"></select></td>
+		<th>사용여부</th>
+		<td><select name="isUse"></select></td>
+	</tr>	
+	<tr class="onlyModify">
+		<th>등록자</th>
+		<td colspan="3"><input name="memberNo" type="text" readonly="readonly"></td>
+	</tr>
+	<tr>
+		<th>제목</th>
+		<td colspan="3"><input name="title" type="text" size="50"></td>
+	</tr>
+	<tr>
+		<th>상세</th>
+		<td colspan="3" width="900"><textarea name="content" rows="1"></textarea></td>
+	</tr>	
+	</table>
+	<div class="btns">
+	
+		<button type="submit" class="btn confirm">수정</button>
+		<button type="button" class="btn gray cancel">취소</button>
+	
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

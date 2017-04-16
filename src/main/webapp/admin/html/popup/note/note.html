@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+	
+	var $body = obj.$body;
+	$body.formData(obj.data);
+	
+	$body.find('form').on('submit', function(){
+		
+		var datas = $body.formData();
+		// TODO 메모 보내기 기능 추가
+		$.ajax({
+			url : '/api/note/send',
+			data: datas,
+			dataType:'json',
+			type:'POST',
+			success:function( datas ) {
+				if( datas.status == 'ok' ) {
+					$body.dialog('close');
+					toastr.success('쪽지를 보냈습니다');
+				}
+			}
+		});
+
+		return false;
+		
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+	
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<table>
+	<caption>데이터 수정</caption>
+	<tr class="onlyModify">
+		<th>번호</th>
+		<td><input name="memberNo" type="text" readonly="readonly"></td>
+		<th>지급 포인트</th>
+		<td><input name="point" type="text" value="0"></td>
+	</tr>
+	<tr>
+		<th>메모</th>
+		<td colspan="3">
+	
+			<textarea name="content" rows="6" cols="50"></textarea>
+		
+		</td>
+	</tr>
+
+	</table>
+	<div class="btns">
+	
+		<button type="submit" class="btn confirm">보내기</button>
+		<button type="button" class="btn gray cancel">취소</button>
+	
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

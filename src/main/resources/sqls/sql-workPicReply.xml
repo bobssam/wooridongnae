@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="workPicReply">
+    <resultMap type="com.suba.vo.WorkPicReplyVO" id="workPicReplyVO" />
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM workpic_reply
+    	WHERE
+			crop_work_pic_no = #{where.cropWorkPicNo}
+
+	</select>
+    <select id="list" resultMap="workPicReplyVO">
+		SELECT
+			n.crop_no,
+			n.crop_work_pic_no,
+			n.reply_no,
+			n.member_no,
+			m.id,
+			m.name,
+			n.reg_date,
+			n.content
+
+		FROM
+			workpic_reply n
+			JOIN member m
+			ON n.member_no = m.member_no
+    	WHERE
+			crop_work_pic_no = #{where.cropWorkPicNo}
+
+		ORDER BY reply_no ASC
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="workPicReplyVO">
+		SELECT
+			n.crop_no,
+			n.crop_work_pic_no,
+			n.reply_no,
+			n.member_no,
+			m.id,
+			m.name,
+			n.reg_date,
+			n.content
+		FROM
+			workpic_reply n
+			JOIN member m
+			ON n.member_no = m.member_no
+    	WHERE
+			n.reply_no = #{replyNo}
+   	</select>
+    <insert id="add">
+    	INSERT INTO workpic_reply (crop_no, crop_work_pic_no, member_no, reg_date, content)
+    	VALUES
+    		(
+    			#{cropNo},
+    			#{cropWorkPicNo},
+    			#{memberNo},
+    			NOW(),
+    			#{content}
+
+    		)
+	    <selectKey resultType="int" keyProperty="replyNo" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+   	</insert>
+    <delete id="delete">
+    	DELETE FROM workpic_reply
+    	WHERE
+			reply_no = #{replyNo}
+   	</delete>
+</mapper>

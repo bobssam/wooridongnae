@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+$(function(jo, obj){
+
+	var $body = obj.$body;
+	var url = '/api/hotdeal/modify';
+	var data = obj.data;
+
+	$body.find('select[name=isUse]').options({'Y':'사용','N':'미사용'});
+
+	// 신규
+	if( obj.data.type == 'new' ) {
+		$body.find('input[name=codeSeq]').disabled();
+		$body.find('.onlyModify').remove();
+	} else {
+
+		$.ajax({
+			url : apiRoot+ '/api/hotdeal/view',
+			data : {where: JSON.stringify({hotdealNo:obj.data.hotdealNo})},
+			dataType: 'json',
+			async: false,
+			success:function(datas) {
+				if( datas.status == 'ok' ) {
+					data = datas.data;
+					$body.formData(data);
+				}
+			}
+		});
+	}
+
+	$body.find('form').on('submit', function(){
+		oEditors[0].exec("UPDATE_CONTENTS_FIELD", []);	// 에디터의 내용이 textarea에 적용됩니다.
+
+		var datas = $body.formData();
+		if( obj.data.type == 'new' )
+			obj.data.parent.add( datas, obj.data.callback );
+		else
+			obj.data.parent.modify( {hotdealNo:datas.hotdealNo}, datas, obj.data.callback );
+		return false;
+
+	});
+	$body.find('.cancel').on('click', function(){
+		$body.dialog('close');
+	});
+
+
+	/*****************************************************
+					파일 업로더 구현
+	*****************************************************/
+	var prevFile = null;
+	$body.find('input[name=file]').fileupload({
+        url: apiRoot+'/api/file/upload/',
+        autoUpload : true,
+        imageMaxWidth: 300,
+        imageMaxHeight: 200,
+
+    }).on('fileuploadadd', function(e, data){
+
+        var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
+        if(data.originalFiles[0]['type'].length && !acceptFileTypes.test(data.originalFiles[0]['type'])) {
+            toastr.error('이미지 파일만 올릴 수 있습니다.');
+            return false;
+        }
+        if(data.originalFiles[0]['size'].length && data.originalFiles[0]['size'] > 1000000) {
+            toastr.error('1메가 이하의 이미지를 올려주세요.');
+            return false;
+        }
+
+        if( prevFile ) prevFile.abort();
+
+        $('.remove').removeClass('hide').off('click').on('click', function(){
+        	$('#fileLabel span').text('사진 업로드');
+        	$(this).addClass('hide');
+        	data.abort();
+        	prevFile = null;
+        });
+
+        prevFile = data;
+        $('#fileLabel span').text(' '+data.originalFiles[0].name);
+
+        var reader = new FileReader();
+        // Closure to capture the file information.
+        reader.onload = (function(e) {
+
+			var img = $('<img>', {src:e.target.result});
+			$('#fileLabel span').prepend(img);
+			if( img.width() > img.height() ) img.attr('width', 100);
+			else img.attr('height', 50);
+		});
+        reader.readAsDataURL(data.originalFiles[0]);
+
+    }).on('fileuploaddone', function(e, data){
+    	if( data.result.status == 'ok' ) {
+    		var fileNo = data.result.data.fileNo;
+    		$body.find('[name=fileNo]').val(fileNo);
+    		fileModeChange('uploaded');
+    		$body.find('img').attr('src', apiRoot+'/api/file/download/'+fileNo);
+    	}
+    });
+
+	function fileModeChange( mode ) {
+		$body.find('.file').hide();
+		$body.find('.file.'+mode).show();
+	}
+	fileModeChange('upload');
+
+	$body.find('.del_img').on('click', function(){
+		$body.find('[name=fileNo]').val(0);
+		fileModeChange('upload');
+	});
+
+	if( data.fileNo ) {
+		fileModeChange('uploaded');
+		$body.find('img').attr('src', apiRoot+'/api/file/download/'+data.fileNo);
+	}
+
+
+	var oEditors = [];
+	setTimeout(function(){
+		var h = $body.height()-$body.find('form').height()-50;
+		console.log(h)
+		$body.find('textarea').height(h);
+
+
+		var editor = nhn.husky.EZCreator.createInIFrame({
+			oAppRef: oEditors,
+			elPlaceHolder: $body.find('[name=comment]')[0],
+			sSkinURI: "plugin/se/SmartEditor2Skin.html",
+			htParams : {
+				bUseToolbar : true,				// 툴바 사용 여부 (true:사용/ false:사용하지 않음)
+				bUseVerticalResizer : true,		// 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음)
+				bUseModeChanger : true,			// 모드 탭(Editor | HTML | TEXT) 사용 여부 (true:사용/ false:사용하지 않음)
+				fOnBeforeUnload : function(){
+					alert("완료!");
+				}
+			}, //boolean
+			fCreator: "createSEditor2"
+		});
+
+	}, 1);
+
+
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<form class="form">
+	<input type="hidden" name="boardType" value="hotdeal">
+	<input type="hidden" name="fileNo" value="0">
+
+	<table>
+	<caption>데이터 수정</caption>
+	<tr class="onlyModify">
+		<th>번호</th>
+		<td><input name="hotdealNo" type="text" readonly="readonly"></td>
+	</tr>
+	<tr class="onlyModify">
+		<th>등록일</th>
+		<td data-name="regDate" data-formatter="timeConv"></td>
+	</tr>
+	<tr>
+		<th>사용여부</th>
+		<td><select name="isUse"></select></td>
+	</tr>
+	<tr>
+		<th>핫딜 이미지</th>
+		<td>
+			<p class="guide">가로 600px 세로 500px 이하의 이미지를 올려주세요 </p>
+
+			<div class="file upload">
+				<input type="file" name="file">
+			</div>
+			<div class="file uploaded"> <button type="button" class="del_img">이미지삭제</button><br/>
+				<img class="auto_size">
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<th>모델</th>
+		<td><input name="model" type="text" size="70"></td>
+	</tr>
+	<tr>
+		<th>제목</th>
+		<td><input name="title" type="text" size="70"></td>
+	</tr>
+	<tr>
+		<th>핫딜 설명</th>
+		<td><textarea name="comment" cols="70" rows="10"></textarea></td>
+	</tr>
+	</table>
+	<div class="btns">
+
+		<button type="submit" class="btn confirm">수정</button>
+		<button type="button" class="btn gray cancel">취소</button>
+
+	</div>
+</form>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="smallArea">
+    <resultMap type="SmallAreaVO" id="smallAreaVO"/>
+    <select id="total" resultType="int">
+
+    	SELECT COUNT(*) FROM small_area
+   		WHERE
+			big_area_no = #{where.bigAreaNo}
+	</select>
+    <select id="list" resultMap="smallAreaVO">
+		SELECT
+			A.big_area_no,
+			B.big_area_name,
+			A.small_area_no,
+			A.small_area_name,
+			A.area_code
+		FROM
+			small_area AS A
+			JOIN big_area AS B
+			ON A.big_area_no = B.big_area_no
+		WHERE
+			A.big_area_no = #{where.bigAreaNo}
+		ORDER BY A.big_area_no DESC
+
+		LIMIT
+			#{start}, #{len}
+    </select>
+    <select id="view" resultMap="smallAreaVO">
+		SELECT
+			A.big_area_no,
+			B.big_area_name,
+			A.small_area_no,
+			A.small_area_name,
+			A.area_code
+		FROM
+			small_area AS A
+			JOIN big_area AS B
+			ON A.big_area_no = B.big_area_no
+		WHERE
+			A.big_area_no = #{where.bigAreaNo}
+			AND A.small_area_no = #{where.smallAreaNo}
+    </select>
+    <select id="viewAreaCode" resultMap="smallAreaVO">
+		SELECT
+			A.big_area_no,
+			B.big_area_name,
+			A.small_area_no,
+			A.small_area_name,
+			A.area_code
+		FROM
+			small_area AS A
+			JOIN big_area AS B
+			ON A.big_area_no = B.big_area_no
+		WHERE
+			A.area_code = #{where.areaCode}
+    </select>
+	<insert id="insert">
+
+		INSERT INTO small_area(
+			big_area_no,
+			small_area_no,
+			small_area_name,
+			area_code
+		)
+		SELECT #{bigAreaNo}, IFNULL(MAX(small_area_no), 0)+1, #{smallAreaName},  #{bigAreaNo}*10000 + IFNULL(MAX(small_area_no), 0)+1
+		FROM small_area
+		WHERE big_area_no = #{bigAreaNo}
+
+    </insert>
+	<update id="modify">
+		UPDATE small_area
+		SET
+			small_area_name = #{smallAreaName}
+
+		WHERE
+			big_area_no = #{where.bigAreaNo}
+			AND small_area_no = #{where.smallAreaNo}
+    </update>
+    <delete id="delete">
+		DELETE FROM small_area
+		WHERE
+			big_area_no = #{where.bigAreaNo}
+			AND small_area_no = #{where.smallAreaNo}
+    </delete>
+</mapper>

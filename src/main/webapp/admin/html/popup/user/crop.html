@@ -155,7 +155,7 @@ $(function(jo, obj){
     		var fileNo = data.result.data.fileNo;
     		$body.find('[name=fileNo]').val(fileNo);
     		fileModeChange('uploaded');
-    		$body.find('img').attr('src', '/admin/api/file/download/'+fileNo);
+    		$body.find('img').attr('src', apiRoot+'/api/file/download/'+fileNo);
     	}
     });
 
@@ -172,7 +172,7 @@ $(function(jo, obj){
 
 	if( data.fileNo ) {
 		fileModeChange('uploaded');
-		$body.find('img').attr('src', '/admin/api/file/download/'+data.fileNo);
+		$body.find('img').attr('src', apiRoot+'/api/file/download/'+data.fileNo);
 	}
 
 
